@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:id="@+id/content_calender_event"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:showIn="@layout/activity_calender_event">
+
+   <com.tns.espapp.CalendarCustomView
+        android:id="@+id/custom_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </com.tns.espapp.CalendarCustomView>
+
+
+</LinearLayout>
