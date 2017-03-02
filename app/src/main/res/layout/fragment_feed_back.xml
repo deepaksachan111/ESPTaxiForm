@@ -1,0 +1,224 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    android:background="#2196F3"
+    tools:context="com.tns.espapp.fragment.FeedBackFragment">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.CardView
+
+            app:cardCornerRadius="10dp"
+            app:cardBackgroundColor="#464845"
+            app:cardElevation="4dp"
+            android:layout_margin="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+    <LinearLayout
+        android:id="@+id/li_remove1"
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <LinearLayout
+            android:id="@+id/li_remove2"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:text="Unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Spinner
+                android:layout_marginTop="5dp"
+                android:id="@+id/spi_unit_feed"
+                android:layout_width="fill_parent"
+                android:layout_height="35dp"
+                android:background="@drawable/spinner_bg"></Spinner>
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:text="Reference No"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:layout_marginTop="5dp"
+                android:background="@drawable/edt_border"
+                android:singleLine="true"
+                android:id="@+id/edt_refenceno_feed"
+                android:layout_width="fill_parent"
+                android:layout_height="35dp"
+                android:ems="10"
+                android:imeOptions="actionNext"/>
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:text="Date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:focusable="false"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/edt_border"
+                android:singleLine="true"
+                android:id="@+id/edt_date_feed"
+                android:layout_width="fill_parent"
+                android:layout_height="35dp"
+                android:ems="10"
+                android:imeOptions="actionNext"/>
+
+
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:text="Add Brief"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:layout_marginTop="5dp"
+                android:background="@drawable/edt_border"
+                 android:lines="5"
+                android:id="@+id/edt_brief_feed"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:imeOptions="actionNext"/>
+
+            <RelativeLayout
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+            <TextView
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:text="Attachment"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent" />
+
+                <ImageView
+
+                    android:src="@android:drawable/ic_input_add"
+                    android:id="@+id/iv_add_attachment"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+
+            </RelativeLayout>
+
+         <!--   <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/edt_border"
+                android:id="@+id/linear_add_attachment"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />-->
+
+
+            <ScrollView
+                android:id="@+id/scrollView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+
+<!--
+                    <ImageButton
+                        android:id="@+id/addField"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_below="@+id/addCategoryLayout"
+                        android:src="@android:drawable/ic_input_add"
+                        android:onClick="addField"
+                        />-->
+                </LinearLayout>
+            </ScrollView>
+
+            <ListView
+                android:id="@+id/listview_add_attachment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </ListView>
+
+            <RelativeLayout
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="10dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Capture Image"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
+                <ImageView
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:id="@+id/iv_capture_image"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+
+            </RelativeLayout>
+                <ListView
+                    android:id="@+id/listview_add_capture"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </ListView>
+
+
+            <Button
+                android:id="@+id/btn_submit_feed"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="22dp"
+                android:background="@drawable/button_shadow_bg"
+                android:text="Submit"
+                android:textAllCaps="false"
+                android:textColor="#fff"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+        <TextView
+              android:visibility="gone"
+            android:id="@+id/tv_setresult"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="set Result"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+    </ScrollView>
+
+
+</RelativeLayout>

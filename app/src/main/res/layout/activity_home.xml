@@ -153,12 +153,17 @@
 
 
         <LinearLayout
+            android:orientation="horizontal"
             android:id="@+id/linear_taxiform_homeactivity"
             android:clickable="true"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+
+
             <TextView
+               android:layout_gravity="center"
+                android:textStyle="bold"
                 android:clickable="true"
                 android:background="@drawable/clickpress"
                 android:id="@+id/tv_taxiform_homeactivity"
@@ -168,14 +173,62 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-
-
         <TextView
-            android:text="Profile"
+            android:textStyle="bold"
+            android:id="@+id/taxiformrecord_history_home"
+            android:text="TaxiForm History"
+            android:background="@drawable/clickpress"
             android:padding="10dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
-    </LinearLayout>
+
+
+    <TextView
+        android:textStyle="bold"
+        android:id="@+id/location_history"
+        android:text="Location History"
+        android:background="@drawable/clickpress"
+        android:padding="10dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+
+        <TextView
+
+            android:textStyle="bold"
+            android:id="@+id/tv_feedback"
+            android:text="Feed Back"
+            android:background="@drawable/clickpress"
+            android:padding="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+
+        <TextView
+
+            android:textStyle="bold"
+            android:id="@+id/tv_feedback_history"
+            android:text="FeedBack History"
+            android:background="@drawable/clickpress"
+            android:padding="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+
+
+        <TextView
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:id="@+id/tv_personal_info"
+            android:text="Personal Info"
+            android:background="@drawable/clickpress"
+            android:padding="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+
+
+</LinearLayout>
 
     <!--   <>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Navigation View SStop>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
 

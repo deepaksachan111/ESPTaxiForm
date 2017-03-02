@@ -100,7 +100,7 @@ public class CalendarCustomView extends LinearLayout {
             @Override
             public void onItemClick(AdapterView<?> parent , View view, int position, long id) {
                 Toast.makeText(context, "Clicked " + ++position, Toast.LENGTH_LONG).show();
-
+                view.setBackgroundColor(Color.GREEN);
                 currentDate.setText(position+" " + sDate);
             }
         });

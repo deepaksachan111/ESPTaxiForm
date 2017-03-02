@@ -1,0 +1,70 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.tns.espapp.fragment.FeedbackFragmentHistory">
+
+ <LinearLayout
+     android:orientation="vertical"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+
+     <LinearLayout
+
+         android:background="@color/gray"
+         android:paddingLeft="10dp"
+         android:paddingRight="10dp"
+         android:paddingTop="5dp"
+         android:paddingBottom="5dp"
+         android:orientation="horizontal"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content">
+
+         <TextView
+             android:textColor="@color/black"
+             android:layout_weight="1"
+             android:text="Unit"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content" />
+
+         <TextView
+             android:textColor="@color/black"
+             android:layout_weight="1"
+             android:text="Ref"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content" />
+         <TextView
+             android:textColor="@color/black"
+             android:layout_weight="1"
+             android:text="Date"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content" />
+         <TextView
+             android:textColor="@color/black"
+
+             android:layout_weight="1"
+             android:text="Status"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content" />
+
+         <TextView
+             android:textColor="@color/black"
+
+             android:layout_weight=".5"
+             android:text="Count"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content" />
+
+     </LinearLayout>
+
+     <ListView
+         android:id="@+id/lst_feedback_record"
+         android:layout_width="match_parent"
+         android:layout_height="fill_parent">
+
+     </ListView>
+
+
+ </LinearLayout>
+
+</FrameLayout>

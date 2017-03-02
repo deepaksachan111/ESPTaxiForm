@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:padding="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+
+            android:layout_weight="1"
+            android:text="Unit"
+            android:id="@+id/unit_name_adap"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_weight="1"
+            android:text="Ref"
+            android:id="@+id/ref_feed_rec_adap"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_weight="1"
+            android:id="@+id/date_feed_rec_adap"
+            android:text="Date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <ImageView
+
+            android:src="@drawable/success"
+            android:layout_weight="1"
+            android:id="@+id/status_feed_rec_adap"
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+
+         <TextView
+            android:textColor="@color/black"
+             android:textStyle="bold"
+             android:layout_weight=".5"
+            android:id="@+id/btn_uploaded_ada"
+            android:text="Count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+
+
+    <!--  <LinearLayout
+          android:orientation="horizontal"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+
+          <LinearLayout
+              android:padding="5dp"
+              android:layout_marginLeft="22dp"
+              android:layout_marginRight="5dp"
+              android:layout_weight="1"
+              android:gravity="center"
+              android:layout_width="0dp"
+              android:orientation="vertical"
+              android:layout_height="wrap_content">
+              <LinearLayout
+                  android:background="@color/gray"
+                  android:padding="5dp"
+                  android:gravity="center"
+                  android:layout_width="wrap_content"
+                  android:orientation="vertical"
+                  android:layout_height="wrap_content">
+
+          <TextView
+              android:text="Attachment"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content" />
+
+          <TextView
+
+              android:textSize="12dp"
+              android:id="@+id/btn_attach_ada"
+              android:text="Attachment"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content" />
+                  </LinearLayout>
+          </LinearLayout>
+
+          <LinearLayout
+              android:padding="5dp"
+
+              android:layout_marginRight="22dp"
+              android:layout_marginLeft="5dp"
+              android:layout_weight="1"
+              android:gravity="center"
+              android:layout_width="0dp"
+              android:orientation="vertical"
+              android:layout_height="wrap_content">
+
+              <LinearLayout
+                  android:background="@color/gray"
+                  android:padding="5dp"
+                  android:gravity="center"
+                  android:layout_width="wrap_content"
+                  android:orientation="vertical"
+                  android:layout_height="wrap_content">
+              <TextView
+                  android:text="   Capture  "
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content" />
+
+              <TextView
+
+                  android:textSize="12dp"
+                  android:id="@+id/btn_capture_ada"
+                  android:text="Capture"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content" />
+
+                  </LinearLayout>
+          </LinearLayout>
+
+
+  &lt;!&ndash;
+          <ListView
+
+              android:visibility="gone"
+              android:layout_weight="1"
+              android:id="@+id/lst_attachnemtAdapter"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content">
+
+          </ListView>
+
+
+          <ListView
+              android:visibility="gone"
+              android:layout_weight="1"
+              android:id="@+id/lst_captureAdapter"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content">
+
+          </ListView>&ndash;&gt;
+
+      </LinearLayout>-->
+
+</LinearLayout>

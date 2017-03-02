@@ -1,14 +1,18 @@
 package com.tns.espapp.service;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,13 +23,24 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
+import com.tns.espapp.AppConstraint;
+import com.tns.espapp.HTTPPostRequestMethod;
 import com.tns.espapp.LocataionData;
 import com.tns.espapp.NetworkConnectionchecker;
+import com.tns.espapp.database.DatabaseHandler;
+import com.tns.espapp.database.LatLongData;
+import com.tns.espapp.fragment.TaxiFormFragment;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,12 +63,18 @@ public class GPSTracker extends Service implements LocationListener {
     double longitude;
     Intent intent;
     public static final String BROADCAST_ACTION = "com.tns.espapp";
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
+    String provider;
 
-
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 5;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 2*60;
     protected LocationManager locationManager;
-
+    private String form_no;
+    private String empid;
+    private String getdate;
+    private String getDate_latlong;
+    private String lats, longi;
+    int flag = 1;
+    DatabaseHandler db;
 
   /*  public GPSTracker(Context mContext) {
       //  this.mContext = mContext;
@@ -67,12 +88,19 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        db = new
+                DatabaseHandler(this);
         intent = new Intent(BROADCAST_ACTION);
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+
+        form_no = intent.getStringExtra("formno");
+        getdate = intent.getStringExtra("getdate");
+        empid = intent.getStringExtra("empid");
 
 
         isRunning = true;
@@ -80,106 +108,55 @@ public class GPSTracker extends Service implements LocationListener {
         timer = new Timer();       // location.
         getLocation();
         Log.v("Service ", "ON start command is start");
-        super.onStartCommand(intent, flags, startId);
+
         return START_STICKY;
 
     }
 
-    private Location getLocation() {
+    private void getLocation() {
 
         try {
 
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             // getting GPS status
             checkGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
             // getting network status
             checkNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
+
             if (!checkGPS && !checkNetwork) {
                 Toast.makeText(getApplicationContext(), "No Service Provider Available", Toast.LENGTH_SHORT).show();
-            } else /*{
+            }
+            if (checkGPS || checkNetwork) {
                 this.canGetLocation = true;
-                // First get location from Network Provider
-                if (checkNetwork) {
-                    Toast.makeText(getApplicationContext(), "Network", Toast.LENGTH_SHORT).show();
+                // Getting LocationManager object from System Service LOCATION_SERVICE
+                // Creating a criteria object to retrieve provider
+                Criteria criteria = new Criteria();
+                // Getting the name of the best provider
+                provider = locationManager.getBestProvider(criteria, true);
 
-                    try {
-                        locationManager.requestLocationUpdates(
-                                LocationManager.NETWORK_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                        Log.d("Network", "Network");
-                        if (locationManager != null) {
-                            loc = locationManager
-                                    .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                // Getting Current Location
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                        }
-
-                        if (loc != null) {
-                            UpdateWithNewLocation();
-                            latitude = loc.getLatitude();
-                            longitude = loc.getLongitude();
-                        }
-                    }
-                    catch(SecurityException e){
-                        e.printStackTrace();
-                    }
+                  //  return null;
                 }
-            }*/
-                // if GPS Enabled get lat/long using GPS Services
-                if (checkGPS) {
-                    this.canGetLocation = true;
-                    //Toast.makeText(getApplicationContext(),"GPS",Toast.LENGTH_SHORT).show();
-                    if (loc == null) {
-                        try {
-                            locationManager.requestLocationUpdates(
-                                    LocationManager.GPS_PROVIDER,
-                                    MIN_TIME_BW_UPDATES,
-                                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                            Log.d("GPS Enabled", "GPS Enabled");
+                loc = locationManager.getLastKnownLocation(provider);
 
-                            if (locationManager != null) {
-                                loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                                if (loc != null) {
-
-                                    onLocationChanged(loc);
-
-                              /*  latitude = loc.getLatitude();
-                                longitude = loc.getLongitude();*/
-                                }
-                            }
-                        } catch (SecurityException e) {
-                            e.printStackTrace();
-
-                        }
-                    }
+                if (loc != null) {
+                   // onLocationChanged(loc);
                 }
+
+                locationManager.requestLocationUpdates(provider, 60000, 0, this);
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return loc;
+      //  return loc;
     }
 
-    public double getLongitude() {
-        if (loc != null) {
-            longitude = loc.getLongitude();
-        }
-        return longitude;
-    }
-
-    public double getLatitude() {
-        if (loc != null) {
-            latitude = loc.getLatitude();
-        }
-        return latitude;
-    }
-
-    public boolean canGetLocation() {
-        return this.canGetLocation;
-    }
 
 
     public void stopUsingGPS() {
@@ -190,6 +167,7 @@ public class GPSTracker extends Service implements LocationListener {
                 return;
             }
             locationManager.removeUpdates(GPSTracker.this);
+
         }
     }
 
@@ -201,10 +179,43 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
 
-      latitude =  location.getLatitude();
+        latitude = location.getLatitude();
         longitude = location.getLongitude();
-        UpdateWithNewLocation();
-        Log.v(latitude+"", latitude+"");
+        lats = String.format("%.6f", latitude) ;
+        longi =  String.format("%.6f", longitude);
+        //UpdateWithNewLocation();
+
+        NetworkConnectionchecker connectionchecker = new NetworkConnectionchecker(getApplicationContext());
+        checkInternet = connectionchecker.isConnectingToInternet();
+
+       /* LocataionData locataionData =new LocataionData(latitude,longitude,checkInternet);
+        //   postevent(locataionData);
+        intent.putExtra("EXTRA", (Serializable) locataionData);
+
+       sendBroadcast(intent);*/
+
+
+        startService(new Intent(getApplication(), SendLatiLongiServerIntentService.class));
+        if (checkInternet && latitude != 0.00) {
+            flag = 0;
+
+            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag));
+           // new getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
+
+        } else {
+            flag = 0;
+            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag));
+        }
+
+    /*
+
+     if (latitude != 0.00) {
+           new getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
+        }
+
+    */
+        Log.v(latitude + "", latitude + "");
+
 
     }
 
@@ -221,20 +232,22 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String s) {
 
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
     }
 
 
-
     private void UpdateWithNewLocation() {
-
 
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
 
-               // latitude = loc.getLatitude();
-               // longitude = loc.getLongitude();
+                // latitude = loc.getLatitude();
+                // longitude = loc.getLongitude();
 
                /* DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Calendar cal = Calendar.getInstance();
@@ -242,18 +255,18 @@ public class GPSTracker extends Service implements LocationListener {
                 final String getDate = dateFormat.format(cal.getTime());*/
 
 
-
-                       handler.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
 
-                        NetworkConnectionchecker connectionchecker = new NetworkConnectionchecker(getApplicationContext());
+                      /*  NetworkConnectionchecker connectionchecker = new NetworkConnectionchecker(getApplicationContext());
                         checkInternet = connectionchecker.isConnectingToInternet();
 
                       LocataionData locataionData =new LocataionData(latitude,longitude,checkInternet);
                      //   postevent(locataionData);
                         intent.putExtra("EXTRA", (Serializable) locataionData);
-                        sendBroadcast(intent);
+
+                        sendBroadcast(intent);*/
 
                     }
                 });
@@ -270,13 +283,119 @@ public class GPSTracker extends Service implements LocationListener {
             timer.cancel();
         }
 
-       // isRunning = false;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        locationManager.removeUpdates(GPSTracker.this);
+
+
+        isRunning = false;
 
         //BUS.unregister(this);
     }
 
     public void postevent(LocataionData s ){
         BUS.post(s);
+    }
+
+    private class getDataTrackTaxiAsnycTask extends AsyncTask<String,Void,String>{
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //  pd.setMessage("Loading");
+
+            //  pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String s = HTTPPostRequestMethod.postMethodforESP(params[0],JsonParameterTaxiTrack());
+            return s;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String re  = s;
+            try {
+
+                JSONArray jsonArray = new JSONArray(s);
+                for(int i = 0; i<jsonArray.length();i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String status = jsonObject.getString("status");
+                    String id = jsonObject.getString("ID");
+                    db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag));
+                }
+            } catch (JSONException e) {
+
+                //  Toast.makeText(getActivity(),"Internet is not working",Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+
+
+        }
+    }
+
+
+    private    JSONObject  JsonParameterTaxiTrack() {
+
+        SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MMM-yyyy");
+
+        try {
+
+            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yy");
+
+            Date dtt = df.parse(getdate);
+            Date ds = new Date(dtt.getTime());
+            getDate_latlong = dateFormat2.format(ds);
+            System.out.println(getDate_latlong );
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+
+            JSONArray jsonArrayParameter = new JSONArray();
+            jsonArrayParameter.put(form_no);
+            jsonArrayParameter.put(empid);
+            jsonArrayParameter.put(lats);
+            jsonArrayParameter.put(longi);
+            jsonArrayParameter.put(getDate_latlong);
+            jsonArrayParameter.put(flag);
+            jsonArrayParameter.put("0");
+
+
+            jsonObject.put("DatabaseName", "TNS_HR");
+            jsonObject.put("ServerName", "bkp-server");
+            jsonObject.put("UserId", "sanjay");
+            jsonObject.put("Password", "tnssoft");
+            jsonObject.put("spName", "USP_Taxi_Lat_Log");
+
+
+      /*      jsonObject.put("ftTaxiFormNo", form_no);
+            jsonObject.put("Empid", empid);
+            jsonObject.put("ftLat", lats);
+            jsonObject.put("ftLog", longi);
+            jsonObject.put("fdCreatedDate", getDate);
+            jsonObject.put("fbStatus", flag);
+            jsonObject.put("fnTaxiFormId", "0");*/
+
+
+
+            // jsonObject.put("spName","USP_Get_Attendance");
+            jsonObject.put("ParameterList",jsonArrayParameter);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return jsonObject;
     }
 
 }

@@ -17,7 +17,7 @@
                     android:topRightRadius="2dip"
                     android:bottomLeftRadius="2dip"
                     android:bottomRightRadius="2dip" />
-                <solid android:color="#E7E8EA" />
+                <solid android:color="#fff" />
                 <stroke android:width=".5px" android:color="#FF058bf5" />
             </shape>
         </item>

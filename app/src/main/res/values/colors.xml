@@ -33,6 +33,12 @@
     <color name="lightgray02">#bfbfbf</color>
     <color name="dark">#000015</color>
     <color name="lightgreen">#336666</color>
+    <color name="limegreen">#00FF00</color>
+    <color name="forestgreen">#228B22</color>
+    <color name="darkgreen">#006400</color>
+    <color name="green">#008000</color>
+
+    <color name="red">#FF0000</color>
     <color name="orrange">#e33d1b</color>
     <color name="darkorrange">#cc2303</color>
 

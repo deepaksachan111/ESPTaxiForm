@@ -60,6 +60,12 @@
     </style>
 
 
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#EFF0F1</item>
+        <item name="android:textColorPrimary">@color/translucent_red</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
     <style name="Custom_progressdialoge" parent="android:Theme.DeviceDefault.Dialog">
         <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
 

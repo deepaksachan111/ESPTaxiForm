@@ -7,6 +7,7 @@ package com.tns.espapp.database;
 public class TaxiFormData {
 
     private int id;
+    private int keyid;
     private String selectdate;
     private String  projecttype;
     private String   formno;
@@ -20,7 +21,8 @@ public class TaxiFormData {
     public TaxiFormData() {
     }
 
-    public TaxiFormData(String selectdate,String formno,String projecttype,String vechicleno, String startkm, String startkm_image, String endkm, String endkmimage,int flag) {
+    public TaxiFormData(int keyids,String selectdate,String formno,String projecttype,String vechicleno, String startkm, String startkm_image, String endkm, String endkmimage,int flag) {
+        this. keyid =keyids;
         this.selectdate = selectdate;
         this.formno = formno;
         this.projecttype = projecttype;
@@ -51,6 +53,14 @@ public class TaxiFormData {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getKeyid() {
+        return keyid;
+    }
+
+    public void setKeyid(int keyid) {
+        this.keyid = keyid;
     }
 
     public String getSelectdate() {

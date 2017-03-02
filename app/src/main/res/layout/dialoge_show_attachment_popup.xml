@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="5dp"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:visibility="gone"
+        android:textSize="19sp"
+        android:id="@+id/tv_att_TEXT"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Attachment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <ListView
+
+        android:id="@+id/lst_attachnemtAdapter"
+        android:divider="@color/gray"
+        android:dividerHeight="1dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+    </ListView>
+
+    <TextView
+        android:visibility="gone"
+        android:textSize="19sp"
+        android:id="@+id/tv_cap_TEXT"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Capture Image"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <ListView
+
+        android:id="@+id/lst_captureAdapter"
+        android:divider="@color/gray"
+        android:dividerHeight="1dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+    </ListView>
+</LinearLayout>

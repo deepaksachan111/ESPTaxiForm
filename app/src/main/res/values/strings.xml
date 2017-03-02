@@ -9,8 +9,7 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_view__search__record">View_Search_Record</string>
     <string name="title_activity_calender_event">CalenderEvent</string>
-
-
+    <string name="location_history"><u>Location History</u></string>
 
 
     <string name="add_event">ADD CALENDAR EVENT</string>

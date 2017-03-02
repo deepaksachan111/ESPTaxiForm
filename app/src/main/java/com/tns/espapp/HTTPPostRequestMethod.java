@@ -6,10 +6,13 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
@@ -36,7 +39,9 @@ public class HTTPPostRequestMethod {
         httpPost.setHeader("Accept","application/json");
         httpPost.setHeader("Content-type", "application/json");
         // List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
-
+      //  HttpParams params = httpClient.getParams();
+       // HttpConnectionParams.setConnectionTimeout(params, 10000);
+       // HttpConnectionParams.setSoTimeout(params, 10000);
 
 
 
@@ -48,6 +53,8 @@ public class HTTPPostRequestMethod {
         }
         se.setContentEncoding((new BasicHeader(HTTP.CONTENT_TYPE, "application/json")));
         httpPost.setEntity(se);
+
+
 
 
 
@@ -68,6 +75,8 @@ public class HTTPPostRequestMethod {
 
         return responce;
     }
+
+
 
 
 

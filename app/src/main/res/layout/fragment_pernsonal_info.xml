@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.tns.espapp.fragment.PernsonalInfoFragment">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="128dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+
+            <ImageView
+                android:src="@drawable/employee_bg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7"
+                android:scaleType="fitXY" />
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+ <!--   ..........................................................................................-->
+    <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:padding="@dimen/activity_horizontal_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.letsnurture.ln_202.coordinatorlayoutpart1.ScrollingActivity"
+      >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:paddingLeft="16dp"
+                android:textStyle="bold"
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textColor="#fff"
+                android:text="Personal Details"
+                android:background="@color/sky"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactItem1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin" />
+
+                <TextView
+                    android:id="@+id/tv_personal_info_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactItem1"
+                    android:layout_toRightOf="@id/ivContactItem1"
+                    android:text="Name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_personal_info_username"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactItem1"
+                    android:layout_toRightOf="@id/ivContactItem1"
+                    android:text="name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+           <!--     <ToggleButton
+                    android:id="@+id/chkState1"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:textOff=""
+                    android:textOn="" />-->
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactItem2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/tvNumber2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactItem2"
+                    android:layout_toRightOf="@id/ivContactItem2"
+                    android:text="Father Name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:id="@+id/tv_personal_info_fathername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tvNumber2"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactItem2"
+                    android:layout_toRightOf="@id/ivContactItem2"
+                    android:text="father name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+              <!--  <ToggleButton
+                    android:id="@+id/chkState2"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="false"
+                    android:padding="6dp"
+                    android:textOff=""
+                    android:textOn="" />
+-->
+            </RelativeLayout>
+
+            <include layout="@layout/item_divider" />
+
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+
+
+    <!--   ..........................................................................................-->
+
+
+</android.support.design.widget.CoordinatorLayout>
+
+
+
+
+
