@@ -13,6 +13,9 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
 import android.util.Log;
@@ -22,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -34,6 +38,7 @@ import com.tns.espapp.AppConstraint;
 import com.tns.espapp.AttachmentData;
 import com.tns.espapp.CaptureData;
 import com.tns.espapp.HTTPPostRequestMethod;
+import com.tns.espapp.MyRecyclerAdapter;
 import com.tns.espapp.R;
 import com.tns.espapp.database.DatabaseHandler;
 import com.tns.espapp.database.FeedbackRecordData;
@@ -59,7 +64,7 @@ import it.sauronsoftware.ftp4j.FTPDataTransferListener;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FeedbackFragmentHistory extends Fragment {
+public class FeedbackFragmentHistory extends Fragment  {
     String empid;
     int getID = 0;
     int getID_cap = 0;
@@ -68,6 +73,7 @@ public class FeedbackFragmentHistory extends Fragment {
     String selectedValue;
     private DatabaseHandler db;
     private ListView lst_feedback_rec;
+
     private List<FeedbackRecordData> feedbackRecordDatas = new ArrayList<>();
 
     public FeedbackFragmentHistory() {
@@ -84,20 +90,54 @@ public class FeedbackFragmentHistory extends Fragment {
         SharedPreferences sharedPreferences_setid = getActivity().getSharedPreferences("ID", Context.MODE_PRIVATE);
         empid = sharedPreferences_setid.getString("empid", "");
 
-      /*  HashMap<String,String> map = new LinkedHashMap<>();
-        map.put("1","gffhgh");
-        map.put("2","2gffhgh");
-        map.put("3","3gffhgh");
-        map.put("4","4gffhgh");
-        map.put("5","5gffhgh");
+
+
+
+/*
+ArrayList<String> callLogList = new ArrayList<>();
+        callLogList.add("One");
+        callLogList.add("two");
+        callLogList.add("three");
+        callLogList.add("foure");
+        callLogList.add("five");
+        callLogList.add("six");
+        callLogList.add("seven");
+
+        MyRecyclerAdapter  myRecyclerAdapter= new MyRecyclerAdapter(getActivity(), callLogList);
+        RecyclerView mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
+        mRecyclerView.setAdapter(myRecyclerAdapter);
+
+
+        myRecyclerAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+             //  Toast.makeText(getActivity(),view.getTag(position)+ "",Toast.LENGTH_LONG).show();
+            }
+        });
+
+*/
+
+/*
+        HashMap<String,CaptureData> map = new LinkedHashMap<>();
+        map.put("1",new CaptureData("gdg","1"));
+        map.put("2",new CaptureData("22gdg","2"));
+        map.put("3",new CaptureData("33gdg","3"));
+        map.put("4",new CaptureData("44gdg","4"));
+        map.put("5",new CaptureData("55gdg","5"));
 
         for(Object o : map.keySet()){
 
             //Toast.makeText(getActivity(),""+ map.get(o),Toast.LENGTH_LONG).show();
         }
 
-        for(Map.Entry s: map.entrySet()){
-            Toast.makeText(getActivity(),""+ s.getKey()+"::"+s.getValue(),Toast.LENGTH_LONG).show();
+
+
+        for(Map.Entry<String , CaptureData> s: map.entrySet()){
+
+            CaptureData c =  s.getValue();
+            Toast.makeText(getActivity(),""+ s.getKey()+"::"+c.getCaptureImageshow(),Toast.LENGTH_LONG).show();
 
         }
        Iterator it = map.entrySet().iterator();
@@ -105,8 +145,7 @@ public class FeedbackFragmentHistory extends Fragment {
         while (it.hasNext()){
 
             Map.Entry entry = (Map.Entry) it.next();
-        }
-*/
+        }*/
 
 
 
@@ -118,6 +157,9 @@ public class FeedbackFragmentHistory extends Fragment {
         lst_feedback_rec.setAdapter(fdAdapter);
         return v;
     }
+
+
+
 
     private class FeedbackRecordAdapter extends ArrayAdapter {
         int deepColor = Color.parseColor("#FFFFFF");

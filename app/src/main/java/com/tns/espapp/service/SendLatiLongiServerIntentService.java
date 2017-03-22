@@ -43,6 +43,7 @@ public class SendLatiLongiServerIntentService extends IntentService {
         db = new DatabaseHandler(getApplicationContext());
         SharedPreferences sharedPreferences_setid = getApplicationContext().getSharedPreferences("ID", Context.MODE_PRIVATE);
         empid = sharedPreferences_setid.getString("empid", "");
+
         while (true) {
             List<LatLongData> latLongDataList = db.getAllLatLongORDerBy();
             int size = latLongDataList.size();
@@ -75,7 +76,7 @@ public class SendLatiLongiServerIntentService extends IntentService {
                     String status = jsonObject.getString("status");
             if (status.equals("1")) {
                 latLongData.setLatlong_flag(1);
-                db.updateLatLong(latLongData.getId(),latLongData.getFormno(),latLongData.getDate(),latLongData.getLat(),latLongData.getLongi(),latLongData.getLatlong_flag());
+                db.updateLatLong(latLongData.getId(),latLongData.getFormno(),latLongData.getDate(),latLongData.getLat(),latLongData.getLongi(),latLongData.getLatlong_flag(),latLongData.getTotaldis());
             }
         }
         } catch (JSONException e) {
@@ -95,7 +96,7 @@ public class SendLatiLongiServerIntentService extends IntentService {
 
             Date dtt = df.parse(latLongData.getDate());
             Date ds = new Date(dtt.getTime());
-             getDate_latlong= dateFormat2.format(ds);
+            getDate_latlong= dateFormat2.format(ds);
             System.out.println(getDate_latlong);
 
         } catch (ParseException e) {
@@ -113,6 +114,7 @@ public class SendLatiLongiServerIntentService extends IntentService {
             jsonArrayParameter.put(getDate_latlong);
             jsonArrayParameter.put(latLongData.getLatlong_flag());
             jsonArrayParameter.put("0");
+            jsonArrayParameter.put(latLongData.getTotaldis());
             jsonObject.put("DatabaseName", "TNS_HR");
             jsonObject.put("ServerName", "bkp-server");
             jsonObject.put("UserId", "sanjay");

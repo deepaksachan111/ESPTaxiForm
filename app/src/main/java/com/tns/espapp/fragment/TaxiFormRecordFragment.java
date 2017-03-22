@@ -75,7 +75,7 @@ public class TaxiFormRecordFragment extends Fragment {
         List<TaxiFormData> taxiformrecordDataList = db.getAllTaxiformData();
         int size = taxiformrecordDataList.size();
 
-            db.deleteSomeRow_LatLong();
+
 
         if(size >0){
             for(TaxiFormData taxiFormData : taxiformrecordDataList){

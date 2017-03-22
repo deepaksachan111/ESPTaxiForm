@@ -13,17 +13,24 @@ public class LatLongData {
     private String lat;
     private String longi;
     private  int latlong_flag;
+    private String totaldis;
+
+
 
     public LatLongData() {
+
     }
 
-    public LatLongData( String formno,String date, String lat, String longi, int latlong_flag) {
+    public LatLongData( String formno,String date, String lat, String longi, int latlong_flag,  String totaldis) {
 
         this.formno = formno;
         this.date = date;
         this.lat = lat;
         this.longi = longi;
         this.latlong_flag = latlong_flag;
+        this.totaldis = totaldis;
+
+
     }
 
     public int getId() {
@@ -72,5 +79,14 @@ public class LatLongData {
 
     public void setLatlong_flag(int latlong_flag) {
         this.latlong_flag = latlong_flag;
+    }
+
+
+    public String getTotaldis() {
+        return totaldis;
+    }
+
+    public void setTotaldis(String totaldis) {
+        this.totaldis = totaldis;
     }
 }

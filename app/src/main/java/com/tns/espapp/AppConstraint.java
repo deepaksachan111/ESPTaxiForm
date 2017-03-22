@@ -31,8 +31,7 @@ public interface AppConstraint {
     // Message Key
     static final String MSG_KEY = "m";
 
-
-
+    void hello();
 
 
 

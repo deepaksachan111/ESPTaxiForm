@@ -59,6 +59,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_LATLONG_LAT ="lat";
     private static final String KEY_LATLONG_LONG ="long";
     private static final String KEY_LATLONG_FLAG ="latlong_flag";
+    private static final String KEY_LATLONG_TOTALDIST="dist_sum";
+
+
 
     // Table FEEDBACK_RECORD Columns name
 
@@ -119,7 +122,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + " integer primary key autoincrement," + KEY_LATLONG_SETFORMNO
                 + " text,"    + KEY_LATLONG_DATE
                 + " text,"+ KEY_LATLONG_LAT + " text,"
-                + KEY_LATLONG_LONG + " text," + KEY_LATLONG_FLAG+ " integer"    +");";
+                + KEY_LATLONG_LONG + " text," + KEY_LATLONG_FLAG+ " integer," +KEY_LATLONG_TOTALDIST + " text"    +");";
 
         String CREATE_TABLE_FEEDBACK_RECORD = "create table "
                 + TABLE_FEEDBACK_RECORD + " (" + KEY_FEEDBACK_RECORD_INCRIID
@@ -202,7 +205,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_LATLONG_DATE, latLongData.getDate());
         values.put(KEY_LATLONG_LAT, latLongData.getLat());
         values.put(KEY_LATLONG_LONG, latLongData.getLongi());
+        values.put(KEY_LATLONG_TOTALDIST, latLongData.getTotaldis());
         values.put(KEY_LATLONG_FLAG, latLongData.getLatlong_flag());
+       // values.put(KEY_LATLONG_TOTALDIST, latLongData.getTotaldis());
+
 
 
 
@@ -328,6 +334,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLat(cursor.getString(3));
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
+                        data.setTotaldis(cursor.getString(6));
+
 
                         //you could add additional columns here..
 
@@ -375,6 +383,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLat(cursor.getString(3));
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
+                        data.setTotaldis(cursor.getString(6));
 
                         //you could add additional columns here..
 
@@ -400,12 +409,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
-    public  List<LatLongData> getFirstLatLong(String formno){
+    public  List<LatLongData> getLatLongbyFormNo(String formno){
         ArrayList<LatLongData> list = new ArrayList<LatLongData>();
         // Select All Query
         // SELECT * FROM members ORDER BY date_of_birth DESC;
        // String selectQuery = "SELECT  * FROM " + TABLE_LATLONG +" ORDER BY "+KEY_LATLONG_INCRIID+" ASC LIMIT 1;";
-        String selectQuery = "SELECT  * FROM " + TABLE_LATLONG + " WHERE " +KEY_LATLONG_SETFORMNO +" = ?" + " ORDER BY "+KEY_LATLONG_INCRIID+  " ASC LIMIT 1" ;
+      //  String selectQuery = "SELECT  * FROM " + TABLE_LATLONG + " WHERE " +KEY_LATLONG_SETFORMNO +" = ?" + " ORDER BY "+KEY_LATLONG_INCRIID+  " ASC LIMIT 1" ;
+
+        String selectQuery = "SELECT  * FROM " + TABLE_LATLONG + " WHERE " +KEY_LATLONG_SETFORMNO +" = ?"  ;
+
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
@@ -423,6 +435,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLat(cursor.getString(3));
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
+                        data.setTotaldis(cursor.getString(6));
 
                         //you could add additional columns here..
 
@@ -473,6 +486,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLat(cursor.getString(3));
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
+                        data.setTotaldis(cursor.getString(6));
                         //you could add additional columns here..
 
                         list.add(data);
@@ -533,7 +547,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public boolean updateLatLong( int incriid,String form_no,String date,String lat,String longi,int flag )
+    public boolean updateLatLong( int incriid,String form_no,String date,String lat,String longi,int flag ,String dis)
     {
         SQLiteDatabase db = this.getReadableDatabase();
         ContentValues args = new ContentValues();
@@ -542,6 +556,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         args.put(KEY_LATLONG_LAT, lat);
         args.put(KEY_LATLONG_LONG, longi);
         args.put(KEY_LATLONG_FLAG,flag);
+        args.put(KEY_LATLONG_TOTALDIST,dis);
 
 
         int i =  db.update(TABLE_LATLONG, args, KEY_LATLONG_INCRIID + "=" + incriid, null);
@@ -844,12 +859,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public boolean updateFeedbackCapture( int incriid,int flag  )
     {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues args = new ContentValues();
         args.put(KEY_FEEDBACK_CAPTURE_FLAG,flag);
 
         int i =  db.update(TABLE_FEEDBACK_CAPTURE, args, KEY_FEEDBACK_CAPTURE_INCRIID + "=" + incriid, null);
+
         return i > 0;
+
     }
 
     public void deleteFeedbackCaptureTable()

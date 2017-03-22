@@ -5,7 +5,9 @@ package com.tns.espapp.fragment;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import android.support.v4.app.Fragment;
@@ -16,6 +18,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -36,19 +39,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
-public class LocationHistoryFragment extends Fragment {
+public class LocationHistoryFragment extends Fragment  {
 
     private ListView listview_locationhistory;
     private DatabaseHandler db;
     private EditText editsearch;
     private LatLongHistoryAdapter adapter;
     private ArrayList<LatLongData> latLongDataArrayList = new ArrayList<>();
+
     public LocationHistoryFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,10 +63,65 @@ public class LocationHistoryFragment extends Fragment {
         listview_locationhistory=(ListView)v.findViewById(R.id.listview_locationhistory);
         db = new DatabaseHandler(getActivity());
 
+
+      //  Toast.makeText(getActivity(),fdd+"",Toast.LENGTH_LONG).show();
+
+      /* List<LatLongData> alllatlong = new ArrayList<>();
+
+        double  first_lat = 0,first_longi = 0,diff_lat = 0,total_lat = 0, diff_longi = 0, total_longi = 0,   alllat =0,
+         alllong =0;
+
+        // LatLongData( String formno,String date, String lat, String longi, int latlong_flag);
+
+        alllatlong.add(new LatLongData("5","5","28.629987", "77.376712",5));
+        alllatlong.add(new LatLongData("7","7","28.525401","77.374279",1));
+        alllatlong.add(new LatLongData("9","9","28.616058","77.373593",9));
+        alllatlong.add(new LatLongData("11","11","28.605509","77.372906",10));
+        alllatlong.add(new LatLongData("11","11","28.7199782","77.367069",10));
+        alllatlong.add(new LatLongData("11","11","28.592849","77.358658",10));
+        alllatlong.add(new LatLongData("11","11","28.583956","77.365353",10));
+        alllatlong.add(new LatLongData("11","11","28.574911","77.356255",10));
+
+
+        for( int i=0; i < alllatlong.size()-1;i++)
+        {
+
+            if( Double.parseDouble(alllatlong.get(i).getLat()) >=Double.parseDouble(alllatlong.get(i+1).getLat() ))
+            {
+                diff_lat = Double.parseDouble(alllatlong.get(i).getLat()) - Double.parseDouble(alllatlong.get(i + 1).getLat());
+                diff_longi = Double.parseDouble(alllatlong.get(i).getLongi()) - Double.parseDouble(alllatlong.get(i + 1).getLongi());
+            }
+
+            if( Double.parseDouble(alllatlong.get(i).getLat()) <=Double.parseDouble(alllatlong.get(i+1).getLat() ))
+            {
+
+                diff_lat = Double.parseDouble(alllatlong.get(i+1).getLat()) - Double.parseDouble(alllatlong.get(i).getLat());
+                diff_longi = Double.parseDouble(alllatlong.get(i+1).getLongi()) - Double.parseDouble(alllatlong.get(i).getLongi());
+            }
+
+
+            total_lat = total_lat + diff_lat;
+            total_longi = total_longi + diff_longi;
+
+            first_lat= Double.parseDouble(alllatlong.get(0).getLat());
+            first_longi= Double.parseDouble(alllatlong.get(0).getLongi());
+
+            alllat = first_lat + total_lat;
+            alllong = first_longi + total_longi;
+
+           // Toast.makeText(getActivity(),total_lat+"",Toast.LENGTH_LONG).show();
+            Log.v("total", total_lat+": "+ total_longi);
+
+
+        }
+
+         double fdd = distenc2(first_lat, first_longi,alllat , alllong);
+*/
+
         List<LatLongData> latLongDataList = db.getAllLatLong();
         int size = latLongDataList.size();
             if(size > 10000) {
-                db.deleteSomeRow_LatLong();
+               db.deleteSomeRow_LatLong();
             }
         if(size >0){
             for(LatLongData latLongData : latLongDataList){
@@ -77,7 +137,10 @@ public class LocationHistoryFragment extends Fragment {
         listview_locationhistory.addHeaderView(view);
 
 
+
         editsearch = (EditText) v.findViewById(R.id.search);
+
+      //  editsearch.setText(distance(28.468262, 77.025322, 28.578103, 77.313731)+"");
 
         // Capture Text in EditText
         editsearch.addTextChangedListener(new TextWatcher() {
@@ -104,32 +167,36 @@ public class LocationHistoryFragment extends Fragment {
 
 
 
+
+
+
     return v;
     }
 
 
-    private double distance(double lat1, double lon1, double lat2, double lon2) {
-        double theta = lon1 - lon2;
-        double dist = Math.sin(deg2rad(lat1))
-                * Math.sin(deg2rad(lat2))
-                + Math.cos(deg2rad(lat1))
-                * Math.cos(deg2rad(lat2))
-                * Math.cos(deg2rad(theta));
-        dist = Math.acos(dist);
-        dist = rad2deg(dist);
-        dist = dist * 60 * 1.1515;
-        return (dist);
-    }
 
-    private double deg2rad(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
 
-    private double rad2deg(double rad) {
-        return (rad * 180.0 / Math.PI);
-    }
 
-  private   class  LatLongHistoryAdapter extends ArrayAdapter {
+private double distenc2(double a, double b, double c, double d){
+
+
+    double distance;
+    Location locationA = new Location("point A");
+    locationA.setLatitude(a);
+    locationA.setLongitude(b);
+
+    Location locationB = new Location("point B");
+    locationB.setLatitude(c);
+    locationB.setLongitude(d);
+
+   // distance = locationA.distanceTo(locationB);   // in meters
+    distance = locationA.distanceTo(locationB)/1000;
+   Log.v("Distance", distance+"");
+    return distance;
+
+}
+
+    private   class  LatLongHistoryAdapter extends ArrayAdapter {
 
 
       private List<LatLongData> searchlist = null;
@@ -166,25 +233,17 @@ public class LocationHistoryFragment extends Fragment {
           TextView lat = (TextView) convertView.findViewById(R.id.lat_adapter);
           TextView longi = (TextView) convertView.findViewById(R.id.longi_adapter);
           ImageView status = (ImageView) convertView.findViewById(R.id.status_adapter);
-
-
+          TextView tv_distence = (TextView) convertView.findViewById(R.id.totalkm_adapter);
 
 
 
 
           LatLongData latLongData = searchlist.get(position);
-
-          List<LatLongData> firstlatlong = db.getFirstLatLong(latLongData.getFormno());
-
-          List<LatLongData> lastlatlong =  db.getLastLatLong(latLongData.getFormno());
-
-         double fdd = distance(Double.parseDouble(firstlatlong.get(position).getLat()),Double.parseDouble(firstlatlong.get(position).getLongi()),Double.parseDouble(lastlatlong.get(position).getLat()),Double.parseDouble(lastlatlong.get(position).getLongi()));
-
-         // Toast.makeText(getActivity(),fdd+"",Toast.LENGTH_LONG).show();
-
+        //  List<LatLongData> alllatlong = db.getLatLongbyFormNo(latLongData.getFormno());
 
           formno.setText(latLongData.getFormno());
           date.setText(latLongData.getDate());
+          tv_distence.setText(String.format("%.2f",Double.parseDouble(latLongData.getTotaldis())));
           String ss = "";
           String s = latLongData.getLat();
           if (s.length()> 4) {
@@ -271,6 +330,8 @@ public class LocationHistoryFragment extends Fragment {
       }
 
   }
+
+
 
 
 

@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -73,6 +74,9 @@ public class GPSTracker extends Service implements LocationListener {
     private String getdate;
     private String getDate_latlong;
     private String lats, longi;
+
+    private  double diste;
+
     int flag = 1;
     DatabaseHandler db;
 
@@ -88,8 +92,7 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        db = new
-                DatabaseHandler(this);
+        db = new DatabaseHandler(this);
         intent = new Intent(BROADCAST_ACTION);
     }
 
@@ -188,24 +191,64 @@ public class GPSTracker extends Service implements LocationListener {
         NetworkConnectionchecker connectionchecker = new NetworkConnectionchecker(getApplicationContext());
         checkInternet = connectionchecker.isConnectingToInternet();
 
-       /* LocataionData locataionData =new LocataionData(latitude,longitude,checkInternet);
-        //   postevent(locataionData);
-        intent.putExtra("EXTRA", (Serializable) locataionData);
+       /*
 
-       sendBroadcast(intent);*/
+        LocataionData locataionData =new LocataionData(latitude,longitude,checkInternet);
+        // postevent(locataionData);
+        intent.putExtra("EXTRA", (Serializable) locataionData);
+        sendBroadcast(intent);
+
+        */
 
 
         startService(new Intent(getApplication(), SendLatiLongiServerIntentService.class));
+        List<LatLongData> latLongDataList = db.getLastLatLong(form_no);
+
+
+
+        if(latLongDataList.size() > 0)
+
+        {
+
+            diste = 0.0;
+            double d1_lat= Double.parseDouble(latLongDataList.get(0).getLat());
+            double d1_long = Double.parseDouble(latLongDataList.get(0).getLongi());
+
+            Log.v("Distance By GPS",diste+""+d1_lat+","+d1_long);
+            diste=   distance(d1_lat,d1_long, latitude,longitude);
+
+           // Toast.makeText(getApplicationContext(),diste+"",4000).show();
+
+           /* for(LatLongData latLongData : latLongDataList){
+
+                double d1_lat = Double.parseDouble(latLongData.getLat());
+                double d1_long = Double.parseDouble(latLongData.getLongi());
+                diste =Double.parseDouble(latLongData.getTotaldis());
+
+                Log.v("Distance By GPS",diste+"");
+                diste=   diste +distenc2(d1_lat,d1_long, latitude,longitude);
+                Log.v("Dist By GPS Value Add",diste+"");
+
+            }*/
+
+        }
+
+
         if (checkInternet && latitude != 0.00) {
             flag = 0;
 
-            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag));
+            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag,String.valueOf(diste)));
            // new getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
 
+
         } else {
+
             flag = 0;
-            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag));
+            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag,String.valueOf(diste)));
+
         }
+
+
 
     /*
 
@@ -214,7 +257,7 @@ public class GPSTracker extends Service implements LocationListener {
         }
 
     */
-        Log.v(latitude + "", latitude + "");
+        Log.v(latitude + "", longitude + "");
 
 
     }
@@ -237,6 +280,9 @@ public class GPSTracker extends Service implements LocationListener {
         startActivity(intent);
 
     }
+
+
+
 
 
     private void UpdateWithNewLocation() {
@@ -272,7 +318,7 @@ public class GPSTracker extends Service implements LocationListener {
                 });
 
             }
-        }, 0, 500000);  // 5 minute
+        }, 0, 100000);  // 5 minute
     }
 
 
@@ -326,7 +372,7 @@ public class GPSTracker extends Service implements LocationListener {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     String status = jsonObject.getString("status");
                     String id = jsonObject.getString("ID");
-                    db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag));
+                    db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag,String.valueOf(diste)));
                 }
             } catch (JSONException e) {
 
@@ -342,11 +388,9 @@ public class GPSTracker extends Service implements LocationListener {
     private    JSONObject  JsonParameterTaxiTrack() {
 
         SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MMM-yyyy");
-
         try {
 
             SimpleDateFormat df = new SimpleDateFormat("dd-MM-yy");
-
             Date dtt = df.parse(getdate);
             Date ds = new Date(dtt.getTime());
             getDate_latlong = dateFormat2.format(ds);
@@ -369,6 +413,7 @@ public class GPSTracker extends Service implements LocationListener {
             jsonArrayParameter.put(getDate_latlong);
             jsonArrayParameter.put(flag);
             jsonArrayParameter.put("0");
+            jsonArrayParameter.put(diste);
 
 
             jsonObject.put("DatabaseName", "TNS_HR");
@@ -398,4 +443,45 @@ public class GPSTracker extends Service implements LocationListener {
         return jsonObject;
     }
 
+
+
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+  /*  private double distenc2(double a, double b, double c, double d){
+
+
+        double distance;
+        Location locationA = new Location("point A");
+        locationA.setLatitude(a);
+        locationA.setLongitude(b);
+
+        Location locationB = new Location("point B");
+        locationB.setLatitude(c);
+        locationB.setLongitude(d);
+
+        // distance = locationA.distanceTo(locationB);   // in meters
+        distance = locationA.distanceTo(locationB)/1000;
+        Log.v("Distance", distance+"");
+        return distance;
+
+    }*/
 }

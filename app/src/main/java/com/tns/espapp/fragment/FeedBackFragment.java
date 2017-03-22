@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -76,10 +78,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import it.sauronsoftware.ftp4j.FTPClient;
 import it.sauronsoftware.ftp4j.FTPDataTransferListener;
-
 
 
 import static android.app.Activity.RESULT_OK;
@@ -90,11 +92,11 @@ import static com.tns.espapp.AppConstraint.FTP_PASS;
  */
 public class FeedBackFragment extends Fragment {
 
-    private     ProgressDialog   progressDialog ;
-    private    ProgressDialog  progressDoalog_att;
-    private    ProgressDialog  progressDoalog_cap;
+    private ProgressDialog progressDialog;
+    private ProgressDialog progressDoalog_att;
+    private ProgressDialog progressDoalog_cap;
 
-    private     DatabaseHandler  db;
+    private DatabaseHandler db;
 
     private static int incri = 1;
     private String empid;
@@ -125,7 +127,6 @@ public class FeedBackFragment extends Fragment {
     private ArrayList<String> capture_ImageList = new ArrayList();
 
 
-
     ArrayList<String> unit_priflist = new ArrayList<>();
     private Button btn_submit;
     TextView tv;
@@ -141,6 +142,8 @@ public class FeedBackFragment extends Fragment {
     private String longi;
     private int getResult_id;
 
+    private Geocoder geocoder;
+
     LocationListener locationListener;
     LocationManager locationManager;
 
@@ -148,16 +151,16 @@ public class FeedBackFragment extends Fragment {
     private ArrayAdapter<String> arrayAdapter;
 
     ProgressDialog progressBar;
-    private int att_length =0;
+    private int att_length = 0;
     private int progressBarStatus_att = 0;
-    private int  progressBarStatus_cap =0;
+    private int progressBarStatus_cap = 0;
     private Handler progressBarHandler = new Handler();
 
     private long fileSize = 0;
 
-    private static  int feebback_ID =0;
-    private static  int attachmentData1_ID =0;
-    private static  int capture1_ID =0;
+    private static int feebback_ID = 0;
+    private static int attachmentData1_ID = 0;
+    private static int capture1_ID = 0;
     List<FeedbackRecordData> getfeedbackRecord;
 
     public FeedBackFragment() {
@@ -173,13 +176,12 @@ public class FeedBackFragment extends Fragment {
         setViewByIDS(view);
         getLocation();
         getUnitSpinnerData();
-
+       // getLoctionName();
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Uploading data please wait...");
         progressDialog.setCancelable(false);
         progressDialog.setIndeterminate(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-
 
 
         SharedPreferences sharedPreferences_setid = getActivity().getSharedPreferences("ID", Context.MODE_PRIVATE);
@@ -200,29 +202,29 @@ public class FeedBackFragment extends Fragment {
         tv = (TextView) view.findViewById(R.id.tv_setresult);
 
 
-        getfeedbackRecord  = db.getAllFeedbackRecord();
+        getfeedbackRecord = db.getAllFeedbackRecord();
         int size = getfeedbackRecord.size();
         List<AttachmentData> attachmentDataslist = db.getAllFeedbackAttachment();
         List<CaptureData> captureDatas = db.getAllFeedbackCaputre();
-        if(size >0){
-            for(FeedbackRecordData aa : getfeedbackRecord){
+        if (size > 0) {
+            for (FeedbackRecordData aa : getfeedbackRecord) {
                 feebback_ID = aa.getfEEDBACK_RECORD_INCRIID();
                 //  Toast.makeText(getActivity(),""+aaa,Toast.LENGTH_LONG).show();
             }
         }
 
-        if(attachmentDataslist.size() >0){
-            for(AttachmentData aa : attachmentDataslist){
-                attachmentData1_ID= aa.getIncriID();
+        if (attachmentDataslist.size() > 0) {
+            for (AttachmentData aa : attachmentDataslist) {
+                attachmentData1_ID = aa.getIncriID();
 
-                tv.append(aa.getAttachshow()+"\n");
+                tv.append(aa.getAttachshow() + "\n");
 
                 //  Toast.makeText(getActivity(),""+aaa,Toast.LENGTH_LONG).show();
             }
         }
-        if(captureDatas.size() >0){
-            for(CaptureData aa : captureDatas){
-                capture1_ID  = aa.getIncri_id();
+        if (captureDatas.size() > 0) {
+            for (CaptureData aa : captureDatas) {
+                capture1_ID = aa.getIncri_id();
                 // Toast.makeText(getActivity(),""+aaa,Toast.LENGTH_LONG).show();
             }
         }
@@ -245,7 +247,6 @@ public class FeedBackFragment extends Fragment {
         lst_captureImages = (ListView) view.findViewById(R.id.listview_add_capture);
 
         spinner_unit = (Spinner) view.findViewById(R.id.spi_unit_feed);
-
 
 
         iv_addAttachment = (ImageView) view.findViewById(R.id.iv_add_attachment);
@@ -327,8 +328,6 @@ public class FeedBackFragment extends Fragment {
             }
 
 
-
-
         }
     };
 
@@ -338,9 +337,9 @@ public class FeedBackFragment extends Fragment {
 
             NetworkConnectionchecker networkConnectionchecker = new NetworkConnectionchecker(getActivity());
             boolean checkNetwork = networkConnectionchecker.isConnectingToInternet();
-            if(!checkNetwork){
+            if (!checkNetwork) {
 
-                Toast.makeText(getActivity(),"internet is not active",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "internet is not active", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -348,18 +347,17 @@ public class FeedBackFragment extends Fragment {
             if (TextUtils.isEmpty(edt_getreferenceNo.getText().toString())) {
                 edt_getreferenceNo.setError("Enter ReferenceNo");
                 edt_getreferenceNo.requestFocus();
-                getStr_Refno ="";
+                getStr_Refno = "";
 
                 return;
-            }else {
-                getStr_Refno =edt_getreferenceNo.getText().toString();
+            } else {
+                getStr_Refno = edt_getreferenceNo.getText().toString();
             }
 
 
-            for(FeedbackRecordData  fd: getfeedbackRecord){
+            for (FeedbackRecordData fd : getfeedbackRecord) {
 
-                if(fd.getfEEDBACK_RECORD_DATE().equals(current_date)&& fd.getfEEDBACK_RECORD_REFERENCENO().equals(getStr_Refno))
-                {
+                if (fd.getfEEDBACK_RECORD_DATE().equals(current_date) && fd.getfEEDBACK_RECORD_REFERENCENO().equals(getStr_Refno)) {
                     edt_getreferenceNo.setError("ReferenceNo Allready Exist ");
                     edt_getreferenceNo.requestFocus();
                     return;
@@ -368,14 +366,13 @@ public class FeedBackFragment extends Fragment {
             }
 
 
-
             if (TextUtils.isEmpty(edtbrief.getText().toString())) {
                 edtbrief.setError("Please Enter Add Brief");
                 edtbrief.requestFocus();
                 return;
-            }else{
+            } else {
 
-               getStr_Brief =edtbrief.getText().toString();
+                getStr_Brief = edtbrief.getText().toString();
 
                 new Thread(new Runnable() {
 
@@ -392,6 +389,7 @@ public class FeedBackFragment extends Fragment {
                                     progressDoalog_att.setMax(a);
                                     progressDoalog_att.setMessage("UploadAttachment....");
                                     progressDoalog_att.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                    progressDoalog_att.setCancelable(false);
                                     progressDoalog_att.show();
 
                                 }
@@ -399,14 +397,15 @@ public class FeedBackFragment extends Fragment {
 
                             for (int j = 0; j < a; j++) {
 
-                                progressBarStatus_att ++;
-                                db.insertfeedbackAttachment(new AttachmentData(getStr_Refno,attachmentDatas.get(j).getAttachshow(),attachmentDatas.get(j).getAttachsend(),0));
-                                attachmentData1_ID = attachmentData1_ID +1;
+                                progressBarStatus_att++;
+                                db.insertfeedbackAttachment(new AttachmentData(getStr_Refno, attachmentDatas.get(j).getAttachshow(), attachmentDatas.get(j).getAttachsend(), 0));
+                                attachmentData1_ID = attachmentData1_ID + 1;
                                 ftpConnect_Attachment ftpConnect_attachment = new ftpConnect_Attachment();
                                 ftpConnect_attachment.uploadFile(new File(attachmentDatas.get(j).getAttachsend()));
                             }
 
-                        }}
+                        }
+                    }
 
                 }).start();
 
@@ -419,16 +418,26 @@ public class FeedBackFragment extends Fragment {
 
 
                         if (b > 0) {
-                            progressDoalog_cap = new ProgressDialog(getActivity());
-                            progressDoalog_cap.setMax(b);
-                            progressDoalog_cap.setMessage("Upload Capture Image....");
-                            progressDoalog_cap.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                            progressDoalog_cap.show();
+
+
+                            getActivity().runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    progressDoalog_cap = new ProgressDialog(getActivity());
+                                    progressDoalog_cap.setMax(b);
+                                    progressDoalog_cap.setMessage("Upload Capture Image....");
+                                    progressDoalog_cap.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                    progressDialog.setCancelable(false);
+                                    progressDoalog_cap.show();
+                                }
+
+                            });
                             for (int j = 0; j < b; j++) {
 
-                                progressBarStatus_cap ++;
+                                progressBarStatus_cap++;
 
-                                db.insertfeedbackCapture(new CaptureData(getStr_Refno,captureDatas.get(j).getCaptureImageshow(),  captureDatas.get(j).getCaptureFilesend(),0));
+                                db.insertfeedbackCapture(new CaptureData(getStr_Refno, captureDatas.get(j).getCaptureImageshow(), captureDatas.get(j).getCaptureFilesend(), 0));
                                 capture1_ID = capture1_ID + 1;
                                 ftpConnect_Capture ftpConnect = new ftpConnect_Capture();
                                 ftpConnect.uploadFile(new File(captureDatas.get(j).getCaptureFilesend()));
@@ -442,17 +451,15 @@ public class FeedBackFragment extends Fragment {
 
 
                 }).start();
-                   progressDialog.show();
-                sendRecordServer(attachmentDatas,captureDatas);
+                progressDialog.show();
+                sendRecordServer(attachmentDatas, captureDatas);
 
-                db.insert_feedbackREcordData(new FeedbackRecordData(st_Spinner_unit,getStr_Refno,current_date,getStr_Brief,0,lats,longi));
-                feebback_ID = feebback_ID+1;
+                db.insert_feedbackREcordData(new FeedbackRecordData(st_Spinner_unit, getStr_Refno, current_date, getStr_Brief, 0, lats, longi));
+                feebback_ID = feebback_ID + 1;
                 btn_submit.setEnabled(false);
             }
         }
     };
-
-
 
 
     @Override
@@ -469,7 +476,7 @@ public class FeedBackFragment extends Fragment {
                 // String absolutePath = filepath.getAbsolutePath();
 
                 // File file = new File(absolutePath);
-                realPath = RealPathUtil.getPath_File_Attacah(getActivity(),uri);
+                realPath = RealPathUtil.getPath_File_Attacah(getActivity(), uri);
 
                 // realPath= RealPathUtil.getPathAttachFile(getActivity(),uri);
 
@@ -522,10 +529,9 @@ public class FeedBackFragment extends Fragment {
                     return;
                 }
 
-                for(FeedbackRecordData  fd: getfeedbackRecord){
+                for (FeedbackRecordData fd : getfeedbackRecord) {
 
-                    if(fd.getfEEDBACK_RECORD_DATE().equals(current_date)&& fd.getfEEDBACK_RECORD_REFERENCENO().equals(v))
-                    {
+                    if (fd.getfEEDBACK_RECORD_DATE().equals(current_date) && fd.getfEEDBACK_RECORD_REFERENCENO().equals(v)) {
                         edt_getreferenceNo.setError("ReferenceNo Allready Exist ");
                         edt_getreferenceNo.requestFocus();
                         return;
@@ -558,7 +564,7 @@ public class FeedBackFragment extends Fragment {
                     FileOutputStream fo;
                     try {
                         // destination.createNewFile();
-                        capturepath = empid + "_"+v+"_" + formated_Date + "_" + formattedTime + "_IMG_" + incri + ".jpg";
+                        capturepath = empid + "_" + v + "_" + formated_Date + "_" + formattedTime + "_IMG_" + incri + ".jpg";
                         incri++;
 
                         file = new File(destination, capturepath);
@@ -578,7 +584,7 @@ public class FeedBackFragment extends Fragment {
 
 
                     String startkmImageEncodeString = encodeToBase64(setTextwithImage, Bitmap.CompressFormat.JPEG, 100);
-                    String totalcapturepath = destinationpath + "/ESP/FeedBack/"+ capturepath;
+                    String totalcapturepath = destinationpath + "/ESP/FeedBack/" + capturepath;
 
                     captureDatas.add(new CaptureData(capturepath, totalcapturepath));
                     capture_ImageList.add(capturepath);
@@ -593,14 +599,14 @@ public class FeedBackFragment extends Fragment {
         }
 
     }
-    public String getPath(Uri uri)
-    {
-        String[] projection = { MediaStore.Images.Media.DATA };
+
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
         if (cursor == null) return null;
-        int column_index =             cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
-        String s=cursor.getString(column_index);
+        String s = cursor.getString(column_index);
         cursor.close();
         return s;
     }
@@ -769,8 +775,6 @@ public class FeedBackFragment extends Fragment {
     }
 
 
-
-
     private class MyTransferListener_Attachment implements FTPDataTransferListener {
 
 
@@ -815,13 +819,12 @@ public class FeedBackFragment extends Fragment {
                     int getid = attachmentData1_ID;
                     db.updateFeedbackAttachment(getid, 1);
                     Toast.makeText(getActivity(), "Attachment upload successfully ...", Toast.LENGTH_SHORT).show();
-                    Log.v("Attachment send  ","Completed");
+                    Log.v("Attachment send  ", "Completed");
                     progressDoalog_att.incrementProgressBy(progressBarStatus_att);
                     int k = progressBarStatus_att;
-                    int p =progressDoalog_att.getMax();
+                    int p = progressDoalog_att.getMax();
 
-                    if (k == p)
-                    {
+                    if (k == p) {
                         attachment_ImageList.clear();
                         adapter_attachment.notifyDataSetChanged();
                         progressDoalog_att.dismiss();
@@ -873,7 +876,6 @@ public class FeedBackFragment extends Fragment {
     public class ftpConnect_Capture {
 
 
-
         public void uploadFile(File fileName) {
 
 
@@ -911,8 +913,6 @@ public class FeedBackFragment extends Fragment {
         }
 
     }
-
-
 
 
     /*******
@@ -958,13 +958,12 @@ public class FeedBackFragment extends Fragment {
                     int getid = capture1_ID;
                     db.updateFeedbackCapture(getid, 1);
                     Toast.makeText(getActivity(), " images upload successfully ...", Toast.LENGTH_SHORT).show();
-                    Log.v("Capter send  ","Completed");
+                    Log.v("Capter send  ", "Completed");
                     progressDoalog_cap.incrementProgressBy(progressBarStatus_cap);
                     int k = progressBarStatus_cap;
-                    int p =progressDoalog_cap.getMax();
+                    int p = progressDoalog_cap.getMax();
 
-                    if (k == p)
-                    {
+                    if (k == p) {
                         capture_ImageList.clear();
                         captureImageAdapter.notifyDataSetChanged();
                         progressDoalog_cap.dismiss();
@@ -1079,7 +1078,7 @@ public class FeedBackFragment extends Fragment {
                     @Override
                     public void onCompleted(Exception e, JsonArray result) {
                         String data = null;
-                        if(result != null){
+                        if (result != null) {
                             data = result.toString();
                             handleResponse(data);
                         }
@@ -1087,9 +1086,10 @@ public class FeedBackFragment extends Fragment {
 
                       /*  if(data !=null && !data.equals("")) {
 
-                        }*/else{
+                        }*/
+                        else {
 
-                            Toast.makeText(getActivity(),"internet is very slow",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "internet is very slow", Toast.LENGTH_LONG).show();
                             pd.dismiss();
                             //getFragmentManager().beginTransaction().replace(R.id.frameLayout_home_frag,new FeedBackFragment()).commit();
                         }
@@ -1152,10 +1152,10 @@ public class FeedBackFragment extends Fragment {
 
     }
 
-    private void sendRecordServer(ArrayList<AttachmentData> attachmentpath,ArrayList<CaptureData> capturepatn) {
+    private void sendRecordServer(ArrayList<AttachmentData> attachmentpath, ArrayList<CaptureData> capturepatn) {
         String strXmlString1_attachment = null;
         String strXmlString1 = null;
-        if(attachmentpath.size() != 0 ) {
+        if (attachmentpath.size() != 0) {
             strXmlString1_attachment = "<AttachData>" + " ";
 
             for (AttachmentData att : attachmentpath) {
@@ -1168,7 +1168,7 @@ public class FeedBackFragment extends Fragment {
             //  strXmlString1_attachment = strXmlString1_attachment.replaceAll("\\\\", "");
         }
 
-        if(capturepatn.size() != 0 ) {
+        if (capturepatn.size() != 0) {
 
             strXmlString1 = "<ImageData>" + " ";
             for (CaptureData capt : capturepatn) {
@@ -1194,8 +1194,8 @@ public class FeedBackFragment extends Fragment {
             jsonArrayParameter.put(empid);
             jsonArrayParameter.put(lats);
             jsonArrayParameter.put(longi);
-            jsonArrayParameter.put( strXmlString1_attachment);
-            jsonArrayParameter.put( strXmlString1);
+            jsonArrayParameter.put(strXmlString1_attachment);
+            jsonArrayParameter.put(strXmlString1);
 
 
             jsonObject.put("DatabaseName", "TNS_HR");
@@ -1218,7 +1218,7 @@ public class FeedBackFragment extends Fragment {
 
                 String url = AppConstraint.COMMONURL;
                 Log.v("JsonObject", jsonObject.toString());
-                String s=  HTTPPostRequestMethod.postMethodforESP(url,jsonObject);
+                String s = HTTPPostRequestMethod.postMethodforESP(url, jsonObject);
                 getResponceRecordServer(s);
 
                 Log.v("Recored Responce", s);
@@ -1231,7 +1231,7 @@ public class FeedBackFragment extends Fragment {
 
     }
 
-    private  void getResponceRecordServer(  String s){
+    private void getResponceRecordServer(String s) {
         final String result = s.toString();
 
         Log.v("getResRecordServer :", result);
@@ -1245,13 +1245,13 @@ public class FeedBackFragment extends Fragment {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
 
-                    for(int i = 0; i<jsonArray.length(); i++){
+                    for (int i = 0; i < jsonArray.length(); i++) {
 
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         getResult_id = jsonObject.getInt("Id");
                         progressDialog.dismiss();
                         //   db.insert_feedbackREcordData(new FeedbackRecordData(st_Spinner_unit,edt_getreferenceNo.getText().toString(),current_date,edtbrief.getText().toString(),1));
-                        db.updateFeedbackRecord(feebback_ID,1);
+                        db.updateFeedbackRecord(feebback_ID, 1);
                         edt_getreferenceNo.getText().clear();
                         edtbrief.getText().clear();
 
@@ -1260,15 +1260,12 @@ public class FeedBackFragment extends Fragment {
                     }
 
 
-
                 } catch (JSONException e) {
 
                     // getFragmentManager().beginTransaction().replace(R.id.frameLayout_home_frag, new FeedBackFragment()).addToBackStack(null).commit();
                     progressDialog.dismiss();
                     e.printStackTrace();
                 }
-
-
 
 
             }
@@ -1552,12 +1549,43 @@ public class FeedBackFragment extends Fragment {
         return 100;
 
     }
+
 */
+  private void getLoctionName() {
+      List<Address> addresses = null;
+
+             double  latitude  =28.567907;
+             double longitude =77.325881;
+      try {
+
+          geocoder = new Geocoder(getActivity(), Locale.getDefault());
+          addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+          if(addresses.size() > 0) {
+
+              String cityName = addresses.get(0).getAddressLine(0);
+              String stateName = addresses.get(0).getAddressLine(1);
+              String countryName = addresses.get(0).getAddressLine(2);
+
+         /*  tv_area.setText(addresses.get(0).getAdminArea());
+             tv_locality.setText(stateName);
+             tv_address.setText(countryName);*/
+
+              Toast.makeText(getActivity(), cityName + "," + stateName + "," + countryName + "," + addresses.get(0).getAdminArea(), Toast.LENGTH_LONG).show();
+
+          }else {
+              Toast.makeText(getActivity(),"Not found gps", Toast.LENGTH_LONG).show();
+
+          }
+
+      } catch (IOException e1) {
+          e1.printStackTrace();
+      }
 
 
 
 
-
+  }
 
 }
 

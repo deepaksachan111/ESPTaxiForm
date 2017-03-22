@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
@@ -28,6 +29,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -76,12 +79,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     Button btn_Login;
     private EditText edt_login, edt_password;
     private String strUserName, strUserPassword;
+    private Boolean GPSAllowed;
+
     private CheckBox chk_remember;
     SharedPreferences sharedPreferences;
     SharedPreferences sharedPreferences_setid;
     SharedPreferences.Editor editor;
     SharedPreferences.Editor editor_id;
     boolean b_savecheck;
+
+    private ProgressBar custom_progress_dialog;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -94,6 +101,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
         findIDS();
 /*
@@ -202,7 +210,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             pd.setIndeterminate(false);
             pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             pd.setMessage("get credentials");
+
+
             pd.show();
+
+          //  pd.setContentView(R.layout.custom_progressdialog_layout);
+           // custom_progress_dialog =(ProgressBar)findViewById(R.id.custom_progress_dialog) ;
+         //   custom_progress_dialog.getIndeterminateDrawable().setColorFilter(Color.parseColor("#C60000"), android.graphics.PorterDuff.Mode.SRC_IN);
+
+
+
         }
 
         @Override
@@ -219,8 +236,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             pd.dismiss();
 
             // startActivity(new Intent(getApplicationContext(),HomeActivity.class));
-
         }
+
     }
 
     private void pasreResultDesplay(String res) {
@@ -229,17 +246,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             JSONObject jsonObject = new JSONObject(res);
             // JSONArray jsonArray = new JSONArray(res);
-
             //  for(int i = 0; i<jsonArray.length(); i++){
-            //
+
             status = jsonObject.getString("status");
             empid = jsonObject.getString("empid");
-
+            GPSAllowed = jsonObject.getBoolean("GPSAllowed");
 
             if (status.equals("1")) {
 
                 editor_id.putString("empid", empid);
+                editor_id.putBoolean("gpsallowed",GPSAllowed);
                 editor_id.commit();
+
                 startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                 finish();
                 //  Toast.makeText(getApplicationContext(),"Welcome : "+empid,Toast.LENGTH_LONG).show();
