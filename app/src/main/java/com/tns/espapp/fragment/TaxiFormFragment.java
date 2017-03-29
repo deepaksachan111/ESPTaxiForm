@@ -235,12 +235,11 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
                     formated_Date = new String(getDate2);
                     formated_Date = formated_Date.replaceAll("-", "");
                     paddedkeyid = String.format("%3s", keyid).replace(' ', '0');
-                 //   tv_form_no.setText(empid + "/" + formated_Date + "/" + paddedkeyid);
 
+                    form_no =empid + "/" + formated_Date + "/" + paddedkeyid;
 
-                 /*   formated_Date = new String(getDate2);
-                    formated_Date.replaceAll("-", "");*/
-                    tv_form_no.setText(formno);
+                   tv_form_no.setText(form_no);
+
                     edt_settaxiform_date.setText(getDate2);
                     edtproject_type.setText(ptype);
                     edt_vehicle_no.setText(vehi_no);

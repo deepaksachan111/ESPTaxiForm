@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.tns.espapp.AppConstraint;
 import com.tns.espapp.AttachmentData;
 import com.tns.espapp.CaptureData;
+import com.tns.espapp.CustomOnItemclickListner;
 import com.tns.espapp.HTTPPostRequestMethod;
 import com.tns.espapp.MyRecyclerAdapter;
 import com.tns.espapp.R;
@@ -169,6 +170,7 @@ ArrayList<String> callLogList = new ArrayList<>();
         private List<FeedbackRecordData> searchlist = null;
         List<FeedbackRecordData> feedbackRecordDatas_List;
 
+       // CustomOnItemclickListner customOnItemclickListner;
 
         public FeedbackRecordAdapter(Context context, int resource, List<FeedbackRecordData> feedbackRecordDatas) {
             super(context, resource, feedbackRecordDatas);

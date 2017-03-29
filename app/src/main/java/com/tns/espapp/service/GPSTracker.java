@@ -13,10 +13,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -36,6 +38,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -135,6 +139,9 @@ public class GPSTracker extends Service implements LocationListener {
                 // Getting LocationManager object from System Service LOCATION_SERVICE
                 // Creating a criteria object to retrieve provider
                 Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+
                 // Getting the name of the best provider
                 provider = locationManager.getBestProvider(criteria, true);
 
@@ -143,13 +150,16 @@ public class GPSTracker extends Service implements LocationListener {
 
                   //  return null;
                 }
-                loc = locationManager.getLastKnownLocation(provider);
+               // loc = locationManager.getLastKnownLocation(provider);
+
 
                 if (loc != null) {
+
+                    Toast.makeText(getApplicationContext(), "Service Provider Available", Toast.LENGTH_SHORT).show();
                    // onLocationChanged(loc);
                 }
 
-                locationManager.requestLocationUpdates(provider, 60000, 0, this);
+                locationManager.requestLocationUpdates(provider, 40000, 0, this);
             }
 
 
@@ -179,11 +189,14 @@ public class GPSTracker extends Service implements LocationListener {
         return null;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onLocationChanged(Location location) {
 
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
+
+        latitude = round(location.getLatitude(),6);
+        longitude = round(location.getLongitude(),6);
+
         lats = String.format("%.6f", latitude) ;
         longi =  String.format("%.6f", longitude);
         //UpdateWithNewLocation();
@@ -206,16 +219,18 @@ public class GPSTracker extends Service implements LocationListener {
 
 
 
+
         if(latLongDataList.size() > 0)
 
         {
 
-            diste = 0.0;
+            diste = 0.0000000;
             double d1_lat= Double.parseDouble(latLongDataList.get(0).getLat());
             double d1_long = Double.parseDouble(latLongDataList.get(0).getLongi());
 
+
             Log.v("Distance By GPS",diste+""+d1_lat+","+d1_long);
-            diste=   distance(d1_lat,d1_long, latitude,longitude);
+            diste=   distenc2(d1_lat,d1_long, latitude,longitude);
 
            // Toast.makeText(getApplicationContext(),diste+"",4000).show();
 
@@ -237,14 +252,14 @@ public class GPSTracker extends Service implements LocationListener {
         if (checkInternet && latitude != 0.00) {
             flag = 0;
 
-            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag,String.valueOf(diste)));
+            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag, String.format("%.3f", diste)));
            // new getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
 
 
         } else {
 
             flag = 0;
-            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag,String.valueOf(diste)));
+            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag,String.format("%.3f", diste)));
 
         }
 
@@ -258,6 +273,8 @@ public class GPSTracker extends Service implements LocationListener {
 
     */
         Log.v(latitude + "", longitude + "");
+
+
 
 
     }
@@ -287,7 +304,6 @@ public class GPSTracker extends Service implements LocationListener {
 
     private void UpdateWithNewLocation() {
 
-
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -299,7 +315,6 @@ public class GPSTracker extends Service implements LocationListener {
                 Calendar cal = Calendar.getInstance();
                 System.out.println(dateFormat.format(cal.getTime()));
                 final String getDate = dateFormat.format(cal.getTime());*/
-
 
                 handler.post(new Runnable() {
                     @Override
@@ -313,12 +328,11 @@ public class GPSTracker extends Service implements LocationListener {
                         intent.putExtra("EXTRA", (Serializable) locataionData);
 
                         sendBroadcast(intent);*/
-
                     }
                 });
 
             }
-        }, 0, 100000);  // 5 minute
+        }, 0, 100000);  // 1 minute
     }
 
 
@@ -466,7 +480,7 @@ public class GPSTracker extends Service implements LocationListener {
         return (rad * 180.0 / Math.PI);
     }
 
-  /*  private double distenc2(double a, double b, double c, double d){
+   private double distenc2(double a, double b, double c, double d){
 
 
         double distance;
@@ -483,5 +497,19 @@ public class GPSTracker extends Service implements LocationListener {
         Log.v("Distance", distance+"");
         return distance;
 
-    }*/
+    }
+
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+
+
+
+
 }

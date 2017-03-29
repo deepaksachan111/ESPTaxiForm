@@ -7,12 +7,14 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -34,7 +36,10 @@ import com.tns.espapp.R;
 import com.tns.espapp.database.DatabaseHandler;
 import com.tns.espapp.database.LatLongData;
 import com.tns.espapp.service.GPSTracker;
+import com.tns.espapp.service.SendLatiLongiServerIntentService;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +69,9 @@ public class LocationHistoryFragment extends Fragment  {
         db = new DatabaseHandler(getActivity());
 
 
-      //  Toast.makeText(getActivity(),fdd+"",Toast.LENGTH_LONG).show();
+
+
+        //  Toast.makeText(getActivity(),fdd+"",Toast.LENGTH_LONG).show();
 
       /* List<LatLongData> alllatlong = new ArrayList<>();
 
@@ -118,7 +125,7 @@ public class LocationHistoryFragment extends Fragment  {
          double fdd = distenc2(first_lat, first_longi,alllat , alllong);
 */
 
-        List<LatLongData> latLongDataList = db.getAllLatLong();
+        List<LatLongData> latLongDataList = db.getAllLatLongORDerBy();
         int size = latLongDataList.size();
             if(size > 10000) {
                db.deleteSomeRow_LatLong();
@@ -236,13 +243,10 @@ private double distenc2(double a, double b, double c, double d){
           TextView tv_distence = (TextView) convertView.findViewById(R.id.totalkm_adapter);
 
 
-
-
           LatLongData latLongData = searchlist.get(position);
-        //  List<LatLongData> alllatlong = db.getLatLongbyFormNo(latLongData.getFormno());
-
           formno.setText(latLongData.getFormno());
           date.setText(latLongData.getDate());
+
           tv_distence.setText(String.format("%.2f",Double.parseDouble(latLongData.getTotaldis())));
           String ss = "";
           String s = latLongData.getLat();
@@ -274,10 +278,6 @@ private double distenc2(double a, double b, double c, double d){
               //status.setText("Failed");
               status.setColorFilter(getResources().getColor(R.color.red));
           }
-
-
-
-
 
 
           return convertView;
@@ -333,6 +333,29 @@ private double distenc2(double a, double b, double c, double d){
 
 
 
+
+    private void saveTextFile( String s){
+
+        try {
+            String     h = DateFormat.format("MM-dd-yyyyy-h-mmssaa", System.currentTimeMillis()).toString();
+            // this will create a new name everytime and unique
+            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+            // if external memory exists and folder with name Notes
+            if (!root.exists()) {
+                root.mkdirs(); // this will create folder.
+            }
+            File filepath = new File(root, h + ".txt");  // file path to save
+            FileWriter writer = new FileWriter(filepath);
+            writer.append(s);
+            writer.flush();
+            writer.close();
+            String m = "File generated with name " + h + ".txt";
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
 
 
 

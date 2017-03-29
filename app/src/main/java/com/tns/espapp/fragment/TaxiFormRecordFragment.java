@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tns.espapp.AppConstraint;
+import com.tns.espapp.CustomOnItemclickListner;
 import com.tns.espapp.HTTPPostRequestMethod;
 import com.tns.espapp.R;
 import com.tns.espapp.database.DatabaseHandler;
@@ -216,11 +217,6 @@ public class TaxiFormRecordFragment extends Fragment {
             status.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
-                  //  String value = ((TextView)view).getText().toString();
-                    // taxiFormData = searchlist.get(position);
-                     // String formno = taxiFormData.getFormno();
-                    //Toast.makeText(getActivity(),formno+ ","+ position,Toast.LENGTH_LONG).show();
 
 
                    if(getstatus.equals("2")){

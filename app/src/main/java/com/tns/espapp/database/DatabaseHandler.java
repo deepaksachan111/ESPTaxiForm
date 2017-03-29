@@ -409,6 +409,57 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
+    public List<LatLongData> getAllLatLongStatus() {
+
+        ArrayList<LatLongData> list = new ArrayList<LatLongData>();
+        // Select All Query
+        // SELECT * FROM members ORDER BY date_of_birth DESC;
+        String selectQuery = "SELECT  * FROM " + TABLE_LATLONG +" WHERE "+KEY_LATLONG_FLAG +" = 0" +" ORDER BY "+KEY_LATLONG_INCRIID +" ASC LIMIT 1";
+        SQLiteDatabase db = this.getReadableDatabase();
+        try {
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            try {
+                // looping through all rows and adding to list
+                if (cursor.moveToFirst()) {
+                    do {
+                        LatLongData data = new LatLongData();
+                        //only one column
+                        data.setId(cursor.getInt(0));
+                        data.setFormno(cursor.getString(1));
+                        data.setDate(cursor.getString(2));
+                        data.setLat(cursor.getString(3));
+                        data.setLongi(cursor.getString(4));
+                        data.setLatlong_flag(cursor.getInt(5));
+                        data.setTotaldis(cursor.getString(6));
+
+                        //you could add additional columns here..
+
+                        list.add(data);
+                    } while (cursor.moveToNext());
+                }
+
+            } finally {
+                try { cursor.close();
+
+                }
+                catch (Exception ignore) {}
+            }
+
+        } finally {
+            try {
+                db.close(); }
+            catch (Exception ignore) {
+
+            }
+        }
+
+        return list;
+    }
+
+
+
+
     public  List<LatLongData> getLatLongbyFormNo(String formno){
         ArrayList<LatLongData> list = new ArrayList<LatLongData>();
         // Select All Query
@@ -547,7 +598,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public boolean updateLatLong( int incriid,String form_no,String date,String lat,String longi,int flag ,String dis)
+    public boolean updateLatLong( int incriid,String form_no,String date,String lat,String longi,int flag )
     {
         SQLiteDatabase db = this.getReadableDatabase();
         ContentValues args = new ContentValues();
@@ -556,7 +607,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         args.put(KEY_LATLONG_LAT, lat);
         args.put(KEY_LATLONG_LONG, longi);
         args.put(KEY_LATLONG_FLAG,flag);
-        args.put(KEY_LATLONG_TOTALDIST,dis);
+      //  args.put(KEY_LATLONG_TOTALDIST,dis);
 
 
         int i =  db.update(TABLE_LATLONG, args, KEY_LATLONG_INCRIID + "=" + incriid, null);

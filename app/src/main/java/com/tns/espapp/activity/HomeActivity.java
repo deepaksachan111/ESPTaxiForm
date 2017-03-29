@@ -1,5 +1,6 @@
 package com.tns.espapp.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,6 +33,8 @@ import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static android.R.attr.fragment;
+
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
 
     String[] permissions = {
@@ -42,10 +45,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public static final int MULTIPLE_PERMISSIONS = 10;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private LinearLayout mDrawerPane, linear_taxiform;
     private Toolbar toolbar;
     private TextView tv_taxiform, tv_userhomeid, tv_location_history,getTv_taxiform_record ,tv_toolbar, tvpersomalinfo,tv_feedback, tv_feedback_history;
-
+    private  LinearLayout linear_taxiform,mDrawerPane;
     private Toast toast;
     private long lastBackPressTime = 0;
 
@@ -64,12 +66,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
        // getSupportActionBar().setTitle("");
        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
        // getSupportActionBar().setHomeButtonEnabled(true);
-
+        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         tv_toolbar =(TextView)toolbar. findViewById(R.id.tv_toolbar);
 
         navigationdrawer();
         findIDS();
-      //  startService(new Intent(getApplication(), SendLatiLongiServerIntentService.class));
+       startService(new Intent(getApplication(), SendLatiLongiServerIntentService.class));
         // mDrawerLayout.closeDrawer(mDrawerPane);
         // mDrawerLayout.openDrawer(mDrawerPane);
 
@@ -80,6 +82,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             if(checkPermissions()){
             }
+
+
+       /*     android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(android.R.anim.slide_in_left,android. R.anim.slide_out_right);
+            ft.replace(R.id.frameLayout_home_frag, new TaxiFormFragment()).commit();*/
 
             getSupportFragmentManager().beginTransaction().add(R.id.frameLayout_home_frag, new TaxiFormFragment()).commit();
 
@@ -164,8 +171,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         if (v == tv_taxiform) {
             tv_toolbar.setText("Taxi" + "Form");
+/*
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(android.R.anim.slide_in_left,android. R.anim.slide_out_right);
+
+            ft.replace(R.id.frameLayout_home_frag, new TaxiFormFragment()).commit();*/
             getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout_home_frag, new TaxiFormFragment()).addToBackStack(null).commit();
             mDrawerLayout.closeDrawer(mDrawerPane);
+
         } else
 
             if (v == tv_location_history) {
