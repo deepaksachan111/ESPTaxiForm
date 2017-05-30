@@ -105,7 +105,7 @@ public class SendLatiLongiServerIntentService extends IntentService {
         for (int i = 0; i < jsonArray.length(); i++) {
 
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    String id = jsonObject.getString("ID");
+                     String id = jsonObject.getString("ID");
                     String status = jsonObject.getString("status");
             if (status.equals("1")) {
                 latLongData.setLatlong_flag(1);
@@ -144,10 +144,12 @@ public class SendLatiLongiServerIntentService extends IntentService {
             jsonArrayParameter.put(empid);
             jsonArrayParameter.put(latLongData.getLat());
             jsonArrayParameter.put(latLongData.getLongi());
-            jsonArrayParameter.put(getDate_latlong);
+            jsonArrayParameter.put(getDate_latlong +" "+latLongData.getCurrent_time_str());
             jsonArrayParameter.put(latLongData.getLatlong_flag());
             jsonArrayParameter.put("0");
+            jsonArrayParameter.put(latLongData.getId());
             jsonArrayParameter.put(latLongData.getTotaldis());
+            jsonArrayParameter.put(latLongData.getSpeed());
             jsonObject.put("DatabaseName", "TNS_HR");
             jsonObject.put("ServerName", "bkp-server");
             jsonObject.put("UserId", "sanjay");

@@ -374,6 +374,10 @@ public class FeedBackFragment extends Fragment {
 
                 getStr_Brief = edtbrief.getText().toString();
 
+
+
+
+
                 new Thread(new Runnable() {
 
                     public void run() {
@@ -405,6 +409,7 @@ public class FeedBackFragment extends Fragment {
                             }
 
                         }
+                        Looper.loop();
                     }
 
                 }).start();
@@ -451,6 +456,7 @@ public class FeedBackFragment extends Fragment {
 
 
                 }).start();
+
                 progressDialog.show();
                 sendRecordServer(attachmentDatas, captureDatas);
 
@@ -460,6 +466,8 @@ public class FeedBackFragment extends Fragment {
             }
         }
     };
+
+
 
 
     @Override
@@ -518,6 +526,9 @@ public class FeedBackFragment extends Fragment {
 
             if (requestCode == ADD_CAPTURE_IMAGE) {
                 String capturepath = "";
+
+             //   String[] all_path = data.getStringArrayExtra("all_path");
+
 
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
 
@@ -1107,6 +1118,7 @@ public class FeedBackFragment extends Fragment {
 
         UnitModel unimodel[] = gson.fromJson(results, UnitModel[].class);
         List<UnitModel[]> list = new ArrayList<>();
+
         list.add(unimodel);
         for (UnitModel[] modle : list) {
             for (UnitModel s : modle) {

@@ -15,9 +15,9 @@
     <item>
         <shape>
             <gradient
-                android:startColor="#483B35"
+                android:startColor="#d67601"
 
-                android:endColor="#624D3C"
+                android:endColor="#d67601"
                 android:angle="270" />
             <stroke
                 android:width="0dp"

@@ -8,26 +8,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
-import android.media.ExifInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,9 +26,7 @@ import android.widget.Toast;
 import com.tns.espapp.AppConstraint;
 import com.tns.espapp.AttachmentData;
 import com.tns.espapp.CaptureData;
-import com.tns.espapp.CustomOnItemclickListner;
 import com.tns.espapp.HTTPPostRequestMethod;
-import com.tns.espapp.MyRecyclerAdapter;
 import com.tns.espapp.R;
 import com.tns.espapp.database.DatabaseHandler;
 import com.tns.espapp.database.FeedbackRecordData;
@@ -48,16 +35,10 @@ import com.tns.espapp.database.FeedbackRecordData;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import it.sauronsoftware.ftp4j.FTPClient;
 import it.sauronsoftware.ftp4j.FTPDataTransferListener;
@@ -170,7 +151,7 @@ ArrayList<String> callLogList = new ArrayList<>();
         private List<FeedbackRecordData> searchlist = null;
         List<FeedbackRecordData> feedbackRecordDatas_List;
 
-       // CustomOnItemclickListner customOnItemclickListner;
+
 
         public FeedbackRecordAdapter(Context context, int resource, List<FeedbackRecordData> feedbackRecordDatas) {
             super(context, resource, feedbackRecordDatas);

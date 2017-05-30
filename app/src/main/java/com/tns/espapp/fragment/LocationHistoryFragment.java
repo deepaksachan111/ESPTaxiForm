@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -48,14 +49,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class LocationHistoryFragment extends Fragment  {
+public class LocationHistoryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private ListView listview_locationhistory;
     private DatabaseHandler db;
     private EditText editsearch;
     private LatLongHistoryAdapter adapter;
     private ArrayList<LatLongData> latLongDataArrayList = new ArrayList<>();
-
+   private  SwipeRefreshLayout swipeRefreshLayout;
     public LocationHistoryFragment() {
         // Required empty public constructor
     }
@@ -65,6 +66,10 @@ public class LocationHistoryFragment extends Fragment  {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_locationhistory, container, false);
+
+        swipeRefreshLayout = (SwipeRefreshLayout)v. findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
         listview_locationhistory=(ListView)v.findViewById(R.id.listview_locationhistory);
         db = new DatabaseHandler(getActivity());
 
@@ -127,7 +132,7 @@ public class LocationHistoryFragment extends Fragment  {
 
         List<LatLongData> latLongDataList = db.getAllLatLongORDerBy();
         int size = latLongDataList.size();
-            if(size > 10000) {
+            if(size > 50000) {
                db.deleteSomeRow_LatLong();
             }
         if(size >0){
@@ -180,6 +185,23 @@ public class LocationHistoryFragment extends Fragment  {
     return v;
     }
 
+    @Override
+    public void onRefresh() {
+        latLongDataArrayList.clear();
+        List<LatLongData> latLongDataList = db.getAllLatLongORDerBy();
+        int size = latLongDataList.size();
+
+        if(size >0){
+            for(LatLongData latLongData : latLongDataList){
+                latLongDataArrayList.add(latLongData);
+            }
+        }
+        adapter = new LatLongHistoryAdapter(getActivity(),R.layout.latlong_historyadapter,latLongDataArrayList);
+        listview_locationhistory.setAdapter(adapter);
+        swipeRefreshLayout.setRefreshing(false);
+
+        adapter.notifyDataSetChanged();
+    }
 
 
 

@@ -1,7 +1,5 @@
 package com.tns.espapp.database;
 
-import java.io.Serializable;
-
 /**
  * Created by TNS on 1/3/2017.
  */
@@ -14,14 +12,26 @@ public class LatLongData {
     private String longi;
     private  int latlong_flag;
     private String totaldis;
+    private String current_time_str;
+    private String speed;
 
 
-
-    public LatLongData() {
+    public  LatLongData(){
 
     }
 
-    public LatLongData( String formno,String date, String lat, String longi, int latlong_flag,  String totaldis) {
+    public LatLongData(String formno, String date, String lat, String longi, int latlong_flag, String totaldis, String current_time_str, String speed) {
+        this.formno = formno;
+        this.date = date;
+        this.lat = lat;
+        this.longi = longi;
+        this.latlong_flag = latlong_flag;
+        this.totaldis = totaldis;
+        this.current_time_str = current_time_str;
+        this.speed = speed;
+    }
+
+/*    public LatLongData(String formno, String date, String lat, String longi, int latlong_flag, String totaldis) {
 
         this.formno = formno;
         this.date = date;
@@ -31,7 +41,7 @@ public class LatLongData {
         this.totaldis = totaldis;
 
 
-    }
+    }*/
 
     public int getId() {
         return id;
@@ -88,5 +98,21 @@ public class LatLongData {
 
     public void setTotaldis(String totaldis) {
         this.totaldis = totaldis;
+    }
+
+    public String getCurrent_time_str() {
+        return current_time_str;
+    }
+
+    public void setCurrent_time_str(String current_time_str) {
+        this.current_time_str = current_time_str;
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
     }
 }

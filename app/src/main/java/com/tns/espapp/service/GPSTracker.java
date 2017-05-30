@@ -2,13 +2,19 @@ package com.tns.espapp.service;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +23,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -24,11 +32,21 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.squareup.otto.Bus;
 import com.tns.espapp.AppConstraint;
 import com.tns.espapp.HTTPPostRequestMethod;
 import com.tns.espapp.LocataionData;
+import com.tns.espapp.NMEAParse;
 import com.tns.espapp.NetworkConnectionchecker;
+import com.tns.espapp.R;
+import com.tns.espapp.activity.HomeActivity;
 import com.tns.espapp.database.DatabaseHandler;
 import com.tns.espapp.database.LatLongData;
 import com.tns.espapp.fragment.TaxiFormFragment;
@@ -45,44 +63,52 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class GPSTracker extends Service implements LocationListener {
+public class GPSTracker extends Service implements com.google.android.gms.location.LocationListener,  GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener , GpsStatus.Listener {
+
     //  private final Context mContext;
-    public static Handler handler = new Handler();
-    public static final Bus BUS = new Bus();
+    private static final String TAG = "gpstracker";
 
     public static boolean isRunning = false;
-    private Timer timer;
 
-    boolean checkGPS = false;
-    boolean checkNetwork = false;
-    boolean canGetLocation = false;
 
     boolean checkInternet;
 
-    Location loc;
     double latitude;
     double longitude;
     Intent intent;
     public static final String BROADCAST_ACTION = "com.tns.espapp";
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
-    String provider;
 
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 2*60;
-    protected LocationManager locationManager;
+    private   int INTERVAL = 0;
+
+
     private String form_no;
     private String empid;
     private String getdate;
-    private String getDate_latlong;
     private String lats, longi;
 
-    private  double diste;
+    private String getTime;
 
-    int flag = 1;
+    private double diste;
+    boolean flag_notification;
+    int flag = 0;
     DatabaseHandler db;
+
+    SharedPreferences preference;
+    private String speed;
+
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
+
+    private static final float MIN_ACCURACY = 25.0f;
+    private Location mBestReading;
+
+    LocationManager lm ;
 
   /*  public GPSTracker(Context mContext) {
       //  this.mContext = mContext;
@@ -97,7 +123,18 @@ public class GPSTracker extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
         db = new DatabaseHandler(this);
+
+        preference = getApplicationContext().getSharedPreferences("SERVICE", Context.MODE_PRIVATE);
+        form_no = preference.getString("formno", "");
+        getdate = preference.getString("getdate", "");
+        empid = preference.getString("empid", "");
+
+        SharedPreferences sharedPreferences_setid =getApplicationContext().getSharedPreferences("ID", Context.MODE_PRIVATE);
+        INTERVAL = sharedPreferences_setid.getInt("gpstimesec",0);
+
+
         intent = new Intent(BROADCAST_ACTION);
+
     }
 
 
@@ -105,84 +142,39 @@ public class GPSTracker extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        form_no = intent.getStringExtra("formno");
-        getdate = intent.getStringExtra("getdate");
-        empid = intent.getStringExtra("empid");
-
-
         isRunning = true;
         // BUS.register(this);
-        timer = new Timer();       // location.
+        // location.
         getLocation();
         Log.v("Service ", "ON start command is start");
-
         return START_STICKY;
 
     }
 
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(INTERVAL);
+        mLocationRequest.setFastestInterval(INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+         lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        lm.addGpsStatusListener(this);
+    }
+
     private void getLocation() {
-
-        try {
-
-             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            // getting GPS status
-            checkGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            // getting network status
-            checkNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        createLocationRequest();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
 
-            if (!checkGPS && !checkNetwork) {
-                Toast.makeText(getApplicationContext(), "No Service Provider Available", Toast.LENGTH_SHORT).show();
-            }
-            if (checkGPS || checkNetwork) {
-                this.canGetLocation = true;
-                // Getting LocationManager object from System Service LOCATION_SERVICE
-                // Creating a criteria object to retrieve provider
-                Criteria criteria = new Criteria();
-                criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+        mGoogleApiClient.connect();
+        Log.d(TAG, "Location update resumed .....................");
 
-                // Getting the name of the best provider
-                provider = locationManager.getBestProvider(criteria, true);
-
-                // Getting Current Location
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                  //  return null;
-                }
-               // loc = locationManager.getLastKnownLocation(provider);
-
-
-                if (loc != null) {
-
-                    Toast.makeText(getApplicationContext(), "Service Provider Available", Toast.LENGTH_SHORT).show();
-                   // onLocationChanged(loc);
-                }
-
-                locationManager.requestLocationUpdates(provider, 40000, 0, this);
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-      //  return loc;
+        //  return loc;
     }
 
-
-
-    public void stopUsingGPS() {
-        if (locationManager != null) {
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                return;
-            }
-            locationManager.removeUpdates(GPSTracker.this);
-
-        }
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -194,74 +186,73 @@ public class GPSTracker extends Service implements LocationListener {
     public void onLocationChanged(Location location) {
 
 
-        latitude = round(location.getLatitude(),6);
-        longitude = round(location.getLongitude(),6);
 
-        lats = String.format("%.6f", latitude) ;
-        longi =  String.format("%.6f", longitude);
+
+
+        SimpleDateFormat time_formatter = new SimpleDateFormat("HH:mm:ss");
+        getTime = time_formatter.format(location.getTime());
+
+        double getspeed = 3.6 * location.getSpeed();
+        speed = String.format("%.3f", getspeed);
+        latitude = round(location.getLatitude(), 6);
+        longitude = round(location.getLongitude(), 6);
+
+
+
+
+        Log.v("LatLong", latitude + "," + longitude);
+
+        lats = String.format("%.6f", latitude);
+        longi = String.format("%.6f", longitude);
+
         //UpdateWithNewLocation();
+
 
         NetworkConnectionchecker connectionchecker = new NetworkConnectionchecker(getApplicationContext());
         checkInternet = connectionchecker.isConnectingToInternet();
 
-       /*
+        if (!flag_notification) {
+            showNotification();
+            flag_notification = true;
+        }
 
-        LocataionData locataionData =new LocataionData(latitude,longitude,checkInternet);
+
         // postevent(locataionData);
-        intent.putExtra("EXTRA", (Serializable) locataionData);
+        intent.putExtra("EXTRA", isRunning);
         sendBroadcast(intent);
-
-        */
 
 
         startService(new Intent(getApplication(), SendLatiLongiServerIntentService.class));
         List<LatLongData> latLongDataList = db.getLastLatLong(form_no);
 
-
-
-
-        if(latLongDataList.size() > 0)
+        if (latLongDataList.size() > 0)
 
         {
-
             diste = 0.0000000;
-            double d1_lat= Double.parseDouble(latLongDataList.get(0).getLat());
+            double d1_lat = Double.parseDouble(latLongDataList.get(0).getLat());
             double d1_long = Double.parseDouble(latLongDataList.get(0).getLongi());
 
+            Log.d("Distance By GPS", diste + "" + d1_lat + "," + d1_long);
+            diste = distenc2(d1_lat, d1_long, latitude, longitude);
 
-            Log.v("Distance By GPS",diste+""+d1_lat+","+d1_long);
-            diste=   distenc2(d1_lat,d1_long, latitude,longitude);
-
-           // Toast.makeText(getApplicationContext(),diste+"",4000).show();
-
-           /* for(LatLongData latLongData : latLongDataList){
-
-                double d1_lat = Double.parseDouble(latLongData.getLat());
-                double d1_long = Double.parseDouble(latLongData.getLongi());
-                diste =Double.parseDouble(latLongData.getTotaldis());
-
-                Log.v("Distance By GPS",diste+"");
-                diste=   diste +distenc2(d1_lat,d1_long, latitude,longitude);
-                Log.v("Dist By GPS Value Add",diste+"");
-
-            }*/
 
         }
 
 
-        if (checkInternet && latitude != 0.00) {
-            flag = 0;
+        flag = 0;
 
-            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag, String.format("%.3f", diste)));
-           // new getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
+/*
+        if( location.getSpeed() >= 0.100) {
+            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag, String.format("%.3f", diste), getTime, speed));
+            Log.v(TAG, getacc + "," + MIN_ACCURACY);
+
+        }else{
+
+            Log.d(TAG,"speed"+ speed);
+        }*/
 
 
-        } else {
-
-            flag = 0;
-            db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag,String.format("%.3f", diste)));
-
-        }
+        db.addTaxiformLatLong(new LatLongData(form_no, getdate, lats, longi, flag, String.format("%.3f", diste), getTime, speed));
 
 
 
@@ -272,89 +263,32 @@ public class GPSTracker extends Service implements LocationListener {
         }
 
     */
-        Log.v(latitude + "", longitude + "");
-
-
-
-
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
 
     }
 
 
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+        Log.d(TAG, "Location update stopped .......................");
 
-
-
-    private void UpdateWithNewLocation() {
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-
-                // latitude = loc.getLatitude();
-                // longitude = loc.getLongitude();
-
-               /* DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                Calendar cal = Calendar.getInstance();
-                System.out.println(dateFormat.format(cal.getTime()));
-                final String getDate = dateFormat.format(cal.getTime());*/
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                      /*  NetworkConnectionchecker connectionchecker = new NetworkConnectionchecker(getApplicationContext());
-                        checkInternet = connectionchecker.isConnectingToInternet();
-
-                      LocataionData locataionData =new LocataionData(latitude,longitude,checkInternet);
-                     //   postevent(locataionData);
-                        intent.putExtra("EXTRA", (Serializable) locataionData);
-
-                        sendBroadcast(intent);*/
-                    }
-                });
-
-            }
-        }, 0, 100000);  // 1 minute
     }
-
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (timer != null) {
-            timer.cancel();
-        }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }
-        locationManager.removeUpdates(GPSTracker.this);
-
-
+        SharedPreferences.Editor editor = preference.edit();
+        editor.clear();
+        editor.commit();
+        stopLocationUpdates();
+        mGoogleApiClient.disconnect();
         isRunning = false;
 
         //BUS.unregister(this);
     }
 
+/*
     public void postevent(LocataionData s ){
         BUS.post(s);
     }
@@ -437,13 +371,15 @@ public class GPSTracker extends Service implements LocationListener {
             jsonObject.put("spName", "USP_Taxi_Lat_Log");
 
 
-      /*      jsonObject.put("ftTaxiFormNo", form_no);
+      */
+/*      jsonObject.put("ftTaxiFormNo", form_no);
             jsonObject.put("Empid", empid);
             jsonObject.put("ftLat", lats);
             jsonObject.put("ftLog", longi);
             jsonObject.put("fdCreatedDate", getDate);
             jsonObject.put("fbStatus", flag);
-            jsonObject.put("fnTaxiFormId", "0");*/
+            jsonObject.put("fnTaxiFormId", "0");*//*
+
 
 
 
@@ -456,7 +392,7 @@ public class GPSTracker extends Service implements LocationListener {
 
         return jsonObject;
     }
-
+*/
 
 
     private double distance(double lat1, double lon1, double lat2, double lon2) {
@@ -480,7 +416,7 @@ public class GPSTracker extends Service implements LocationListener {
         return (rad * 180.0 / Math.PI);
     }
 
-   private double distenc2(double a, double b, double c, double d){
+    private double distenc2(double a, double b, double c, double d) {
 
 
         double distance;
@@ -493,8 +429,8 @@ public class GPSTracker extends Service implements LocationListener {
         locationB.setLongitude(d);
 
         // distance = locationA.distanceTo(locationB);   // in meters
-        distance = locationA.distanceTo(locationB)/1000;
-        Log.v("Distance", distance+"");
+        distance = round(locationA.distanceTo(locationB) / 1000, 6);
+        Log.v("Distance", distance + "");
         return distance;
 
     }
@@ -509,7 +445,94 @@ public class GPSTracker extends Service implements LocationListener {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private void showNotification() {
+        Notification myNotication;
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 1, intent, 0);
+        Notification.Builder builder = new Notification.Builder(GPSTracker.this);
 
 
+        builder.setAutoCancel(true);
+        builder.setTicker("Telecom Network Solutions ");
+        builder.setContentTitle("Taxi App");
+        builder.setContentText("Start Travelling");
+        builder.setSmallIcon(R.mipmap.taxi_icon);
+        builder.setContentIntent(pendingIntent);
+        builder.setOngoing(true);
+        builder.setSubText("Running Status");   //API level 16
+        // builder.setNumber(1);
+        builder.build();
+        //builder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
+        myNotication = builder.getNotification();
+        manager.notify(11, myNotication);
+
+         /*
+                //API level 8
+                Notification myNotification8 = new Notification(R.drawable.ic_launcher, "this is ticker text 8", System.currentTimeMillis());
+
+                Intent intent2 = new Intent(MainActivity.this, SecActivity.class);
+                PendingIntent pendingIntent2 = PendingIntent.getActivity(getApplicationContext(), 2, intent2, 0);
+                myNotification8.setLatestEventInfo(getApplicationContext(), "API level 8", "this is api 8 msg", pendingIntent2);
+                manager.notify(11, myNotification8);
+                */
+
+
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "onConnected - isConnected ...............: " + mGoogleApiClient.isConnected());
+        startLocationUpdates();
+    }
+
+    protected void startLocationUpdates() {
+        PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+        Log.d(TAG, "Location update started ..............: ");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "onConnectionSuspended ..............: ");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed ..............: ");
+
+    }
+
+    @Override
+    public void onGpsStatusChanged(int event) {
+
+
+
+
+        GpsStatus gpsStatus = lm.getGpsStatus(null);
+
+        if (gpsStatus != null) {
+            Iterable<GpsSatellite> satellites = gpsStatus.getSatellites();
+            Iterator<GpsSatellite> sat = satellites.iterator();
+            String lSatellites = null;
+            int i = 0;
+            while (sat.hasNext()) {
+                GpsSatellite satellite = sat.next();
+                lSatellites = "Satellite" + (i++) + ": "
+                        + satellite.getPrn() + ","
+                        + satellite.usedInFix() + ","
+                        + satellite.getSnr() + ","
+                        + satellite.getAzimuth() + ","
+                        + satellite.getElevation() + "\n\n";
+
+                Log.d("SATELLITE", lSatellites);
+            }
+        }
+
+
+    }
 
 }

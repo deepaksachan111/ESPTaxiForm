@@ -1,5 +1,6 @@
 package com.tns.espapp.database;
 
+import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.google.firebase.messaging.RemoteMessage;
 import com.tns.espapp.AttachmentData;
 import com.tns.espapp.CaptureData;
 
@@ -30,6 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_FEEDBACK_RECORD ="feedback_record";
     private static final String TABLE_FEEDBACK_ATTACHMENT ="feedback_attachment";
     private static final String TABLE_FEEDBACK_CAPTURE ="feedback_capture";
+    private static final String TABLE_NOTIFICATION ="notification";
 
     // Contacts Table Columns names
 
@@ -60,6 +63,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_LATLONG_LONG ="long";
     private static final String KEY_LATLONG_FLAG ="latlong_flag";
     private static final String KEY_LATLONG_TOTALDIST="dist_sum";
+    private static final String KEY_LATLONG_TIME="latlong_time";
+    private static final String KEY_LATLONG_SPEED="latlong_speed";
 
 
 
@@ -93,6 +98,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_FEEDBACK_CAPTURE_FLAG ="feedback_capture_flag";
 
 
+    // Table Notification Columns name
+    private static final String KEY_NOTIFICATION_INCRIID ="incri_notification";
+    private static final String KEY_NOTIFICTION_TITTLE="notification_tittle";
+    private static final String KEY_NOTIFICATION_MESSAGE="notification_message";
+    private static final String KEY_NOTIFICATION_IMAGE="notification_image";
+    private static final String KEY_NOTIFICATION_FLAG="notification_flag";
+
+
+
 
 
     public DatabaseHandler(Context context) {
@@ -122,7 +136,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + " integer primary key autoincrement," + KEY_LATLONG_SETFORMNO
                 + " text,"    + KEY_LATLONG_DATE
                 + " text,"+ KEY_LATLONG_LAT + " text,"
-                + KEY_LATLONG_LONG + " text," + KEY_LATLONG_FLAG+ " integer," +KEY_LATLONG_TOTALDIST + " text"    +");";
+                + KEY_LATLONG_LONG + " text," + KEY_LATLONG_FLAG+ " integer," +KEY_LATLONG_TOTALDIST + " text," +KEY_LATLONG_TIME + " text,"  + KEY_LATLONG_SPEED + " text"    +");";
 
         String CREATE_TABLE_FEEDBACK_RECORD = "create table "
                 + TABLE_FEEDBACK_RECORD + " (" + KEY_FEEDBACK_RECORD_INCRIID
@@ -140,12 +154,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TABLE_FEEDBACK_CAPTURE + " (" + KEY_FEEDBACK_CAPTURE_INCRIID + " integer primary key autoincrement,"+ KEY_FEEDBACK_CAPTURE_REFNO + " text,"
                 + KEY_FEEDBACK_CAPTURE_IMAGENAME + " text,"+ KEY_FEEDBACK_CAPTURE_IMAGE_FILE+ " text," + KEY_FEEDBACK_CAPTURE_FLAG+ " integer"    +");";
 
+        String CREATE_TABLE_NOTIFICATION = "create table "
+                + TABLE_NOTIFICATION + " (" + KEY_NOTIFICATION_INCRIID + " integer primary key autoincrement,"+ KEY_NOTIFICTION_TITTLE + " text,"
+                + KEY_NOTIFICATION_MESSAGE + " text,"+ KEY_NOTIFICATION_IMAGE+ " text," + KEY_NOTIFICATION_FLAG+ " integer"   +");";
+
+
+
 
         db.execSQL(CREATE_TABLE_ADD_POST_DATA);
         db.execSQL(CREATE_TABLE_LATlONGDATA);
         db.execSQL(CREATE_TABLE_FEEDBACK_RECORD);
         db.execSQL(CREATE_TABLE_FEEDBACK_ATTACHMENT);
         db.execSQL(CREATE_TABLE_FEEDBACK_CAPTURE);
+        db.execSQL(CREATE_TABLE_NOTIFICATION);
 
         Log.v(TAG, "Database table created");
 
@@ -161,6 +182,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FEEDBACK_RECORD);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FEEDBACK_ATTACHMENT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FEEDBACK_CAPTURE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATION);
+
         // Create tables again
         onCreate(db);
     }
@@ -207,6 +230,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_LATLONG_LONG, latLongData.getLongi());
         values.put(KEY_LATLONG_TOTALDIST, latLongData.getTotaldis());
         values.put(KEY_LATLONG_FLAG, latLongData.getLatlong_flag());
+        values.put(KEY_LATLONG_TIME, latLongData.getCurrent_time_str());
+        values.put(KEY_LATLONG_SPEED, latLongData.getSpeed());
        // values.put(KEY_LATLONG_TOTALDIST, latLongData.getTotaldis());
 
 
@@ -335,6 +360,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
                         data.setTotaldis(cursor.getString(6));
+                        data.setCurrent_time_str(cursor.getString(7));
+                        data.setSpeed(cursor.getString(8));
 
 
                         //you could add additional columns here..
@@ -384,6 +411,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
                         data.setTotaldis(cursor.getString(6));
+                        data.setCurrent_time_str(cursor.getString(7));
+                        data.setSpeed(cursor.getString(8));
 
                         //you could add additional columns here..
 
@@ -432,6 +461,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
                         data.setTotaldis(cursor.getString(6));
+                        data.setCurrent_time_str(cursor.getString(7));
+                        data.setSpeed(cursor.getString(8));
 
                         //you could add additional columns here..
 
@@ -487,6 +518,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
                         data.setTotaldis(cursor.getString(6));
+                        data.setCurrent_time_str(cursor.getString(7));
+                        data.setSpeed(cursor.getString(8));
 
                         //you could add additional columns here..
 
@@ -538,6 +571,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         data.setLongi(cursor.getString(4));
                         data.setLatlong_flag(cursor.getInt(5));
                         data.setTotaldis(cursor.getString(6));
+                        data.setCurrent_time_str(cursor.getString(7));
+                        data.setSpeed(cursor.getString(8));
                         //you could add additional columns here..
 
                         list.add(data);
@@ -947,6 +982,57 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 */
 
+    //....................................Notification...............................................
+
+    public void add_DB_Notification(NotificationData notificationData) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NOTIFICTION_TITTLE, notificationData.getNoti_tittle());
+        values.put(KEY_NOTIFICATION_MESSAGE,notificationData.getNoti_message());
+        values.put(KEY_NOTIFICATION_IMAGE, notificationData.getNoti_image());
+
+
+
+
+
+        // Inserting Row
+        db.insert(TABLE_NOTIFICATION, null, values);
+        Log.v(TAG, "Databaser insert notification table");
+        //2nd argument is String containing nullColumnHack
+        db.close(); // Closing database connection
+    }
+
+    public List<NotificationData> getAllNotification() {
+
+        ArrayList<NotificationData> list = new ArrayList<NotificationData>();
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_NOTIFICATION;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                NotificationData data = new NotificationData();
+                //only one column
+                data.setNoti_id(cursor.getInt(0));
+                data.setNoti_tittle(cursor.getString(1));
+                data.setNoti_message(cursor.getString(2));
+                data.setNoti_tittle(cursor.getString(3));
+               data.setFlag(cursor.getInt(4));
+
+                //you could add additional columns here..
+
+                list.add(data);
+            } while (cursor.moveToNext());
+        }
+
+
+
+        return list;
+    }
 
 
 }

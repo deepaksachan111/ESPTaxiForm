@@ -20,19 +20,13 @@
 
 
             <LinearLayout
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Form No :" />
 
-                <TextView
-                    android:visibility="gone"
+
+               <TextView
                     android:id="@+id/tv_formno_taxiadapter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -41,12 +35,14 @@
                     android:textColor="@color/sky" />
 
                 <TextView
+                    android:visibility="gone"
                     android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="" />
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/tv_status_taxiadapter"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -86,11 +82,13 @@
                     android:text="Date" />
 
                 <TextView
+
                     android:id="@+id/tv_project_taxiadapter"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="ProjectType" />
+
 
                 <TextView
                     android:id="@+id/tv_vechicle_taxiadapter"

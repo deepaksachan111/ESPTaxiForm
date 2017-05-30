@@ -3,8 +3,10 @@ package com.tns.espapp.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -24,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -49,6 +52,7 @@ import com.tns.espapp.HTTPPostRequestMethod;
 import com.tns.espapp.LocataionData;
 import com.tns.espapp.LocationAddress;
 import com.tns.espapp.R;
+import com.tns.espapp.push_notification.MyFirebaseInstanceIDService;
 import com.tns.espapp.service.GPSTracker;
 
 import org.json.JSONArray;
@@ -75,11 +79,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"
     };
+
+
+
     public static final int MULTIPLE_PERMISSIONS = 10;
     Button btn_Login;
     private EditText edt_login, edt_password;
     private String strUserName, strUserPassword;
-    private Boolean GPSAllowed;
+
 
     private CheckBox chk_remember;
     SharedPreferences sharedPreferences;
@@ -87,6 +94,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     SharedPreferences.Editor editor;
     SharedPreferences.Editor editor_id;
     boolean b_savecheck;
+    private Boolean GPSAllowed;
+    private int gpstimesec;
 
     private ProgressBar custom_progress_dialog;
 
@@ -135,6 +144,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         }
+
+       String Token = MyFirebaseInstanceIDService.SharedSave.getInstance(getApplicationContext()).getDeviceToken();
+
+        String s = Token;
+
+        Log.v("Token No", s.toString());
 
 
     }
@@ -251,11 +266,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             status = jsonObject.getString("status");
             empid = jsonObject.getString("empid");
             GPSAllowed = jsonObject.getBoolean("GPSAllowed");
+            gpstimesec = jsonObject.getInt("GPStime");
 
             if (status.equals("1")) {
 
                 editor_id.putString("empid", empid);
                 editor_id.putBoolean("gpsallowed",GPSAllowed);
+                editor_id.putInt("gpstimesec",gpstimesec);
                 editor_id.commit();
 
                 startActivity(new Intent(getApplicationContext(), HomeActivity.class));
@@ -353,6 +370,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+        unregisterReceiver(broadcastRecevier);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+      registerReceiver(broadcastRecevier, new IntentFilter(GPSTracker.BROADCAST_ACTION));
+    }
+
+      private  BroadcastReceiver broadcastRecevier  = new BroadcastReceiver() {
+          @Override
+          public void onReceive(Context context, Intent intent) {
+
+              Toast.makeText(context,intent.getStringExtra("TOKEN"),Toast.LENGTH_LONG).show();
+
+          }
+      };
 
 }

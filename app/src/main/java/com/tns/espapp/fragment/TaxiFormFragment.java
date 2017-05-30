@@ -3,8 +3,10 @@ package com.tns.espapp.fragment;
 
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -13,6 +15,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,22 +24,33 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.tns.espapp.AppConstraint;
 import com.tns.espapp.DrawBitmapAll;
 import com.tns.espapp.HTTPPostRequestMethod;
@@ -63,7 +77,9 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TaxiFormFragment extends Fragment implements View.OnClickListener {
+public class TaxiFormFragment extends Fragment implements View.OnClickListener,
+        com.google.android.gms.location.LocationListener,  GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private EditText edt_settaxiform_date, edt_startkmImage, edt_endkm_Image, edtstartkmtext, edtendkmtext, edtproject_type, edt_vehicle_no;
     private int flag = 0;
@@ -75,7 +91,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
 
     private String startkmImageEncodeString = "", endkmImageEncodeString = "";
     String empid;
-    private boolean getGPSAllowed;
+
 
     int keyid = 1;
 
@@ -92,7 +108,8 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
 
     String current_date;
 
-    String getDate_latlong;
+    private int gpstimesec;
+    private boolean getGPSAllowed;
 
     String form_no;
     String paddedkeyid;
@@ -105,6 +122,16 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
     LocationListener locationListener;
     LocationManager locationManager;
     boolean statusOfGPS;
+
+
+    private  SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
+    private static final long INTERVAL = 1000 * 5 * 1; //1 minute
+    private static final long FASTEST_INTERVAL = 1000 * 2 * 1; // 1 minute
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
+    ImageView iv_status;
 
     public TaxiFormFragment() {
         // Required empty public constructor
@@ -124,19 +151,30 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
         }*/
 
     }
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_taxi_form, container, false);
+
+        Toolbar toolbar =(Toolbar)getActivity().findViewById(R.id.toolbar);
+         iv_status =(ImageView) toolbar. findViewById(R.id.status_taxiform);
+
         findIDS(v);
      /*   if (shouldAskPermissions()) {
             askPermissions();
         }*/
 
      // boolean b = GPSTracker.isRunning;
-
+        sharedPreferences     = getActivity().getSharedPreferences("SERVICE", Context.MODE_PRIVATE);
         intent = new Intent(getActivity(), GPSTracker.class);
         /*if(!b){
             getActivity().startService(intent);
@@ -144,7 +182,12 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
         }*/
         getLocation();
 
-        // getActivity().startService(new Intent(getActivity(), GPSTracker.class));
+        createLocationRequest();
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
 
 
@@ -154,6 +197,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
         SharedPreferences sharedPreferences_setid = getActivity().getSharedPreferences("ID", Context.MODE_PRIVATE);
         empid = sharedPreferences_setid.getString("empid", "");
         getGPSAllowed = sharedPreferences_setid.getBoolean("gpsallowed",false);
+        gpstimesec = sharedPreferences_setid.getInt("gpstimesec",0);
 
 
         //  SharedPreferences.Editor editor = sharedPreferences_setid.edit();
@@ -180,7 +224,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
         int a = data.size();
 
 
-        if(a >100){
+        if(a >200){
             db.deleteSomeRow_Taxiform();
         }
 
@@ -192,7 +236,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
                 incri_id = datas.getId();
                 keyid = datas.getKeyid();
                 String getDate2 = datas.getSelectdate();
-                String formno = datas.getFormno();
+                form_no = datas.getFormno();
                 String ptype = datas.getProjecttype();
                 String vehi_no = datas.getVechicleno();
                 String stkm = datas.getStartkm();
@@ -232,11 +276,11 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
 
                 } else {
 
-                    formated_Date = new String(getDate2);
+                 /*   formated_Date = new String(getDate2);
                     formated_Date = formated_Date.replaceAll("-", "");
                     paddedkeyid = String.format("%3s", keyid).replace(' ', '0');
 
-                    form_no =empid + "/" + formated_Date + "/" + paddedkeyid;
+                    form_no =empid + "/" + formated_Date + "/" + paddedkeyid;*/
 
                    tv_form_no.setText(form_no);
 
@@ -724,6 +768,11 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
 
     private class getDataAsnycTask extends AsyncTask<String, Void, String> {
 
@@ -749,7 +798,8 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             pd.dismiss();
-          getActivity().stopService(intent);
+            getActivity().stopService(intent);
+            iv_status.setVisibility(View.GONE);
            // GPSTracker.isRunning= false;
 
 
@@ -790,7 +840,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
 
 
                 } else {
-                    btn_close.setEnabled(true);
+
                     Toast.makeText(getActivity(), "Internet is not working", Toast.LENGTH_LONG).show();
                     flag = 2;
                     // db.updatedetails(keyid, edt_settaxiform_date.getText().toString(), edtproject_type.getText().toString(), edtstartkmtext.getText().toString(), edt_startkmImage.getText().toString(), edtendkmtext.getText().toString(), edt_endkm_Image.getText().toString(), flag);
@@ -889,10 +939,19 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
                         }
                          if(!GPSTracker.isRunning){
 
-                             intent.putExtra("formno",form_no);
+                           /*  intent.putExtra("formno",form_no);
                              intent.putExtra("getdate", current_date);
-                             intent.putExtra("empid",empid);
-                             getActivity().startService(intent);
+                             intent.putExtra("empid",empid);*/
+                              if(!getGPSAllowed ) {
+                                  editor = sharedPreferences.edit();
+                                  editor.putString("formno", form_no);
+                                  editor.putString("getdate", current_date);
+                                  editor.putString("empid", empid);
+                                  editor.commit();
+
+                                  getActivity().startService(intent);
+
+                              }
                          }
 
 
@@ -1009,7 +1068,6 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 if (!b_insert) {
 
                     db.updatedetails(incri_id, edt_settaxiform_date.getText().toString(), form_no, edtproject_type.getText().toString(), edt_vehicle_no.getText().toString(), edtstartkmtext.getText().toString(), edt_startkmImage.getText().toString(), edtendkmtext.getText().toString(), edt_endkm_Image.getText().toString(), flag);
@@ -1067,25 +1125,45 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
         }
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
 
-
-
-
-
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
 
     @Override
     public void onPause() {
         super.onPause();
-     // getActivity().unregisterReceiver(broadcastReceiver);
+
+            //stopLocationUpdates();
+
+
+     getActivity().unregisterReceiver(broadcastReceiver);
       //GPSTracker.BUS.unregister(this);
     }
 
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+        Log.d("TaxiFormFragment", "Location update stopped .......................");
+    }
     @Override
     public void onResume() {
         super.onResume();
+
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+            Log.d("TaxiFormFragment", "Location update resumed .....................");
+        }
+
       //  GPSTracker.BUS.register(this);
-       // getActivity().registerReceiver(broadcastReceiver, new IntentFilter(GPSTracker.BROADCAST_ACTION));
+        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(GPSTracker.BROADCAST_ACTION));
     }
 
 
@@ -1093,15 +1171,17 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy(){
         super.onDestroy();
-      /*
+
+
+
        try {
 
-                getActivity().unregisterReceiver(broadcastReceiver);
+           getActivity().unregisterReceiver(broadcastReceiver);
 
         }catch (Exception e){
 
             e.printStackTrace();
-        }*/
+        }
 
 
     }
@@ -1110,65 +1190,33 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
 
 
 
-  /*  private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
+   private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+       @Override
+       public void onReceive(Context context, Intent intent) {
            // mContact = (Contact)getIntent().getExtras().getSerializable(EXTRA_CONTACT);
 
-            LocataionData locataionData = (LocataionData) intent.getExtras().getSerializable("EXTRA");
+           boolean status = intent.getBooleanExtra("EXTRA",false);
+          if(status == true) {
+              iv_status.setVisibility(View.VISIBLE);
+             // iv_status.setBackgroundResource(R.drawable.blink_animation);
+              // AnimationDrawable frameAnimation = (AnimationDrawable) iv_status.getBackground();
 
-            lats = String.valueOf(locataionData.getLatitute());
-            longi = String.valueOf(locataionData.getLongitute());
-            boolean status = locataionData.isStatus();
+              // Start the animation (looped playback by default).
+             // frameAnimation.start();
 
-            if(status){
-
-                latlongtableflag =1;
-                db.addTaxiformLatLong(new LatLongData(form_no, current_date,lats,longi,latlongtableflag));
-
-               // new  getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
-             *//*   List<LatLongData> latLongDataList = db.getAllLatLong();
-                int a =latLongDataList.size();
-                if(a > 0){
-                    for(LatLongData latLongData : latLongDataList){
-
-                        int flags = latLongData.getLatlong_flag();
-                        if(flags == 0){
-                            latlongtableflag =1;
-                            db.addTaxiformLatLong(new LatLongData(form_no,current_date,lats,longi,flag));
-                            new  getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
-                        }
-                    }
-                    }*//*
-
-            }else {
-                latlongtableflag =0;
-                db.addTaxiformLatLong(new LatLongData(form_no, current_date,lats,longi,latlongtableflag));
-            }
-
-
-
+             // Toast.makeText(getActivity(), "running" + "", Toast.LENGTH_LONG).show();
+          }else {
+              iv_status.setVisibility(View.GONE);
+              Toast.makeText(getActivity(), "not running" + "", Toast.LENGTH_LONG).show();
+          }
            // new  getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);
 
 
+       }
 
 
-          *//*  List<LatLongData> latLongDataList = db.getAllLatLong();
-            int a =latLongDataList.size();
-            if(a > 0){
-                for(LatLongData latLongData : latLongDataList){
 
-                    String latiii = latLongData.getLat();
-                }
-            }*//*
-
-
-          //  Toast.makeText(getActivity(), lats+","+longi, Toast.LENGTH_LONG).show();
-
-        }
-    };*/
-
-
+   };
 
 
 
@@ -1282,6 +1330,31 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener {
         return jsonObject;
     }*/
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d("TaxiFormFrgament", "onConnected - isConnected ...............: " + mGoogleApiClient.isConnected());
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    protected void startLocationUpdates() {
+        PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+        Log.d("TaxiFormFrgament", "Location update started ..............: ");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        lats  =  String.valueOf(location.getLatitude());
+        longi =  String.valueOf(location.getLongitude());
+
+
+
+    }
 
 
 
