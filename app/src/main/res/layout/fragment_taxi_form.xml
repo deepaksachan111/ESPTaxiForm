@@ -7,6 +7,7 @@
     android:showDividers="middle"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
+    android:id="@+id/taxifragment"
   android:background="#2196F3"
     tools:context="com.tns.espapp.fragment.TaxiFormFragment">
 

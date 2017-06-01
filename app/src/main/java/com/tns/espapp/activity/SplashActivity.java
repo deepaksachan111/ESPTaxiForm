@@ -17,13 +17,13 @@ import java.util.Set;
  * status bar and navigation/system bar) with user interaction.
  */
 public class SplashActivity extends AppCompatActivity {
-        DatabaseHandler db;
 
+      DatabaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-      db = new DatabaseHandler(this);
+        db = new DatabaseHandler(this);
         setContentView(R.layout.activity_splash);
 
         if (getIntent().getExtras() != null) {

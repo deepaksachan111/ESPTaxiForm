@@ -2,6 +2,7 @@ package com.tns.espapp.fragment;
 
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -151,6 +152,10 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
         }*/
 
     }
+
+
+
+
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(INTERVAL);
