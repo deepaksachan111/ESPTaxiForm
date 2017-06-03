@@ -254,13 +254,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             }  else
             if (v == tv_locationmap) {
-                tv_toolbar.setText("Current Location");
+               // tv_toolbar.setText("Current Location");
 
                 startActivity(new Intent(getApplicationContext(), RouteMapsActivity.class));
                 mDrawerLayout.closeDrawer(mDrawerPane);
             }
         if (v == tv_notification) {
-            tv_toolbar.setText("Notification");
+           // tv_toolbar.setText("Notification");
 
             startActivity(new Intent(getApplicationContext(), ReadNotificationActivity.class));
             mDrawerLayout.closeDrawer(mDrawerPane);

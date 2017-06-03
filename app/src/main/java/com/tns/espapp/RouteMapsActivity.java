@@ -193,6 +193,9 @@ public class RouteMapsActivity extends FragmentActivity implements LocationListe
 
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        Log.v("getdata",location.getLatitude()+","+ location.getLongitude()+","+location.getAccuracy()+","+location.distanceTo(location));
+
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Position");

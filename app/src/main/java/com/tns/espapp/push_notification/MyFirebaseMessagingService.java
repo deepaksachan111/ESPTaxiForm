@@ -24,6 +24,9 @@ import com.tns.espapp.database.NotificationData;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by TNS on 15-May-17.
@@ -34,11 +37,14 @@ DatabaseHandler db;
 
    private static final String TAG = "FirebaseMessageService";
     Bitmap bitmap;
-
+    String currentDateTimeString;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+        Date dateobj = new Date();
 
+         currentDateTimeString = df.format(dateobj) ;
          db =new DatabaseHandler(getApplicationContext());
         // There are two types of messages data messages and notification messages. Data messages are handled
         // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
@@ -74,7 +80,10 @@ DatabaseHandler db;
 
         //To get a Bitmap image from the URL received
         bitmap = getBitmapfromUrl(imageUri);
-        db.add_DB_Notification(new NotificationData(tittle,message,imageUri,0));
+        if(message != null) {
+            db.add_DB_Notification(new NotificationData(tittle, message, currentDateTimeString, 0));
+
+        }
         sendNotification(message, bitmap, tittle);
 
     }

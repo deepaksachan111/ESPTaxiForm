@@ -1034,5 +1034,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
+    public void deleteSingleRow(String value)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_NOTIFICATION + " WHERE " + KEY_NOTIFICATION_MESSAGE + "='" + value + "'");
+        db.close();
+    }
+
 
 }

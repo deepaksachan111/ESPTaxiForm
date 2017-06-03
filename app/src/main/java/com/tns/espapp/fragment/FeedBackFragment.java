@@ -441,11 +441,11 @@ public class FeedBackFragment extends Fragment {
                             for (int j = 0; j < b; j++) {
 
                                 progressBarStatus_cap++;
-
                                 db.insertfeedbackCapture(new CaptureData(getStr_Refno, captureDatas.get(j).getCaptureImageshow(), captureDatas.get(j).getCaptureFilesend(), 0));
                                 capture1_ID = capture1_ID + 1;
                                 ftpConnect_Capture ftpConnect = new ftpConnect_Capture();
                                 ftpConnect.uploadFile(new File(captureDatas.get(j).getCaptureFilesend()));
+
                             }
 
                         }
