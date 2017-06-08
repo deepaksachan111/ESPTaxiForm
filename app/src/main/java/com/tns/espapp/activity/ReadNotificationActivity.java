@@ -108,7 +108,8 @@ public class ReadNotificationActivity extends AppCompatActivity {
 
                 final NotificationData data = notificationDataArraylist.get(position);
 
-              viewHolder.textView.setAnimation(scaleUp);
+            //  viewHolder.textView.setAnimation(scaleUp);
+
               viewHolder.textView.setText(data.getNoti_message());
               viewHolder.time.setText(data.getNoti_tittle());
               viewHolder.iv_delete.setOnClickListener(new View.OnClickListener() {

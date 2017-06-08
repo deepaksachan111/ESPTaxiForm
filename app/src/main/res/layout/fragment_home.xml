@@ -1,28 +1,44 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context="com.tns.espapp.fragment.HomeFragment">
 
 <!-- TODO: Update blank fragment layout -->
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:text="@string/hello_blank_fragment" />
-
     <TextView
-        android:id="@+id/setpos"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="100dp"
+        android:text="Welcome to "
+        android:id="@+id/txt_example3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="44sp"
+        android:textStyle="bold"
+        android:textColor="@color/red"
+        android:shadowColor="@color/gray"
+        android:shadowDx="-2"
+        android:shadowDy="-2"
+        android:shadowRadius="1" />
+<LinearLayout
+    android:layout_centerInParent="true"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    </LinearLayout>
 
-</FrameLayout>
+    <ImageView
+
+        android:layout_gravity="right"
+        android:src="@drawable/tns_icon"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+
+
+
+
+</LinearLayout>
+
+
+
+</RelativeLayout>

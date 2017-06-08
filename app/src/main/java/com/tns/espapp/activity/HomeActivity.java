@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.tns.espapp.R;
 import com.tns.espapp.fragment.FeedBackFragment;
 import com.tns.espapp.fragment.FeedbackFragmentHistory;
+import com.tns.espapp.fragment.HomeFragment;
 import com.tns.espapp.fragment.LocationHistoryFragment;
 import com.tns.espapp.RouteMapsActivity;
 import com.tns.espapp.fragment.PernsonalInfoFragment;
@@ -113,7 +114,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             ft.setCustomAnimations(android.R.anim.slide_in_left,android. R.anim.slide_out_right);
             ft.replace(R.id.frameLayout_home_frag, new TaxiFormFragment()).commit();*/
 
-            getSupportFragmentManager().beginTransaction().add(R.id.frameLayout_home_frag, new TaxiFormFragment()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.frameLayout_home_frag,  HomeFragment.newInstance(1)).commit();
 
         }
 

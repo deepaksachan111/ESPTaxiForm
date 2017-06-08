@@ -27,7 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     @InjectView(R.id.your_full_name) EditText edt_name;
     @InjectView(R.id.btn_register) Button btn_register;
-    @InjectView(R.id.back_register) ImageView back_register;
+   // @InjectView(R.id.back_register) ImageView back_register;
     @InjectView(R.id.reg_token_no) EditText reg_token_no;
     @InjectView(R.id.reg_get_emino) EditText reg_emino;
 
@@ -59,17 +59,17 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     }
-    @OnClick( {R.id.back_register})
+   /* @OnClick( {R.id.back_register})
     public void back(){
         finish();
 
-    }
+    }*/
 
 
 
     @OnClick({ R.id.btn_register})
     public void commonMethod(Button button) {
-       if(button.getText().toString().equals("Sign Up")){
+       if(button.getText().toString().equals("Register")){
 
            Toast.makeText(getApplicationContext(),button.getText().toString(),Toast.LENGTH_LONG).show();
        }

@@ -37,8 +37,8 @@ public class HomeFragment extends Fragment {
 
 
 
-        TextView setpos =(TextView)v.findViewById(R.id.setpos);
-        String getvalue = getArguments().getString("index");
+      //  TextView setpos =(TextView)v.findViewById(R.id.setpos);
+       // String getvalue = getArguments().getString("index");
         //  setpos.setText(getvalue+"");
 
 

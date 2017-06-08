@@ -163,7 +163,7 @@
                                 android:textStyle="bold"
                                 android:textSize="20dp"
                                 android:textColor="#fff"
-                                android:text="Welcome "
+                                android:text="User "
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
                             <TextView
@@ -296,7 +296,7 @@
             android:textStyle="italic"
             android:text=" @version: 1.0 "
             android:textColor="@android:color/holo_purple"
-         android:paddingRight="10dp"
+            android:paddingRight="10dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
 
