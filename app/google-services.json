@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "566429275139",
+    "firebase_url": "https://espapp-e64e3.firebaseio.com",
+    "project_id": "espapp-e64e3",
+    "storage_bucket": "espapp-e64e3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566429275139:android:05ecff46f31fdffc",
+        "android_client_info": {
+          "package_name": "com.tns.espapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "566429275139-ik3otk94hd453f6j075ordjidscdqk3t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tns.espapp",
+            "certificate_hash": "b4ca47df2dacc77bdad93b30ee3d35a8bd0b34c6"
+          }
+        },
+        {
+          "client_id": "566429275139-o6bqrt93ott2u50ckh2gbdcsfpvcmbfa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB826hPdQq8P-9JTL1CG9-HcrruJvnA74g"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "566429275139-o6bqrt93ott2u50ckh2gbdcsfpvcmbfa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
