@@ -48,6 +48,8 @@ tools:context="com.tns.espapp.RouteMapsActivity" >
          android:layout_height="wrap_content">
 
          <EditText
+             android:layout_margin="2dp"
+             android:background="@drawable/edittextborder"
              android:id="@+id/edt_search_loc"
              android:layout_weight="9"
              android:layout_width="0dp"

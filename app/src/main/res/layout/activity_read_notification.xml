@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context="com.tns.espapp.activity.ReadNotificationActivity">
 
-
+<!--
     <LinearLayout
         android:orientation="vertical"
         android:background="@color/colorPrimaryDark"
@@ -40,26 +40,25 @@
 
             </TextView>
 
-      <!--      <TextView
+      &lt;!&ndash;      <TextView
                 android:padding="6dp"
                 android:layout_weight="3"
                 android:text="Contacts"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"  >
-            </TextView>-->
+            </TextView>&ndash;&gt;
 
         </TableRow>
 
 
 
-    </LinearLayout>
+    </LinearLayout>-->
 
     <FrameLayout
 
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginTop="50dp"
         android:background="@color/white"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">

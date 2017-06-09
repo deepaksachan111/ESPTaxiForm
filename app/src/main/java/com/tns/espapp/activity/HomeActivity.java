@@ -2,6 +2,7 @@ package com.tns.espapp.activity;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,8 +17,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
@@ -37,6 +40,7 @@ import com.tns.espapp.fragment.HomeFragment;
 import com.tns.espapp.fragment.LocationHistoryFragment;
 import com.tns.espapp.RouteMapsActivity;
 import com.tns.espapp.fragment.PernsonalInfoFragment;
+import com.tns.espapp.fragment.ReadNotificationFragment;
 import com.tns.espapp.fragment.TaxiFormFragment;
 import com.tns.espapp.fragment.TaxiFormRecordFragment;
 import com.tns.espapp.service.SendLatiLongiServerIntentService;
@@ -71,7 +75,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private Toolbar toolbar;
-    private TextView tv_taxiform, tv_userhomeid, tv_location_history,getTv_taxiform_record ,tv_toolbar, tvpersomalinfo,tv_feedback, tv_feedback_history,tv_locationmap,tv_notification;
+    private TextView tv_taxiform, tv_userhomeid, tv_location_history,getTv_taxiform_record ,tv_toolbar, tvpersomalinfo,tv_feedback, tv_feedback_history,tv_locationmap,tv_notification,tv_taxiform_home_fragment;
     private  LinearLayout linear_taxiform,mDrawerPane;
     private Toast toast;
     private long lastBackPressTime = 0;
@@ -81,6 +85,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
 
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +129,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setProfileImg();
 
+
+       ImageView icon_logout = (ImageView)findViewById(R.id.icon_logout);
+        icon_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                // Closing all the Activities
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                // Add new Flag to start new Activity
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                // Staring Login Activity
+                startActivity(i);
+                finish();
+            }
+        });
+
+
       /*  Fragment fragment_obj = (Fragment) getSupportFragmentManager().findFragmentById(R.id.taxifragment);
 
         TextView tv= (TextView)fragment_obj.getView().findViewById(R.id.tv_form_no);*/
@@ -146,6 +170,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         tv_feedback_history=(TextView)findViewById(R.id.tv_feedback_history);
         tv_locationmap =(TextView)findViewById(R.id.tv_currentlocation);
         tv_notification=(TextView)findViewById(R.id.tv_notification);
+        tv_taxiform_home_fragment=(TextView)findViewById(R.id.tv_taxiform_home_fragment);
+
         tv_taxiform.setOnClickListener(this);
         linear_taxiform.setOnClickListener(this);
         tv_location_history.setOnClickListener(this);
@@ -155,6 +181,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         tv_feedback_history.setOnClickListener(this);
         tv_locationmap.setOnClickListener(this);
         tv_notification.setOnClickListener(this);
+        tv_taxiform_home_fragment.setOnClickListener(this);
     }
 
 
@@ -263,10 +290,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (v == tv_notification) {
            // tv_toolbar.setText("Notification");
 
-            startActivity(new Intent(getApplicationContext(), ReadNotificationActivity.class));
+          //  startActivity(new Intent(getApplicationContext(), ReadNotificationActivity.class));
+            tv_toolbar.setText("Notification");
+            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout_home_frag, new ReadNotificationFragment()).addToBackStack(null).commit();
             mDrawerLayout.closeDrawer(mDrawerPane);
-        }
 
+        }
+        if (v == tv_taxiform_home_fragment) {
+            // tv_toolbar.setText("Notification");
+
+            tv_toolbar.setText("ESP");
+            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout_home_frag, new HomeFragment()).commit();
+            mDrawerLayout.closeDrawer(mDrawerPane);
+
+        }
 
     }
 
@@ -325,19 +362,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private boolean checkPermissions() {
+
         int result;
         List<String> listPermissionsNeeded = new ArrayList<>();
         for (String p : permissions) {
             result = ContextCompat.checkSelfPermission(this, p);
-            if (result != PackageManager.PERMISSION_GRANTED) {
+            if (result != PackageManager.PERMISSION_GRANTED)
+            {
                 listPermissionsNeeded.add(p);
             }
+
         }
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MULTIPLE_PERMISSIONS);
             return false;
+
         }
+
         return true;
+
     }
 
     @Override
@@ -406,7 +449,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             cursor.close();
 
 
-
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
             btMap = BitmapFactory.decodeFile(picturePath);
 
@@ -427,11 +469,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             editor.commit();
         }
 
-
-
-
-
     }
+
+
     public static String encodeTobase64(Bitmap image){
         Bitmap image1 = image;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -475,6 +515,53 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             toast.show();
         }
     }
+
+    public void alertdiaolog_logout() {
+
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        // set title
+        alertDialogBuilder.setTitle("Would you like to logout?");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Click yes to logout!")
+                .setCancelable(false)
+                .setPositiveButton("Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int id) {
+                                // if this button is clicked, close
+                                // current activity
+                                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                                // Closing all the Activities
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                // Add new Flag to start new Activity
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                // Staring Login Activity
+                                startActivity(i);
+                                finish();
+
+                            }
+                        })
+                .setNegativeButton("No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int id) {
+                                // if this button is clicked, just close
+                                // the dialog box and do nothing
+
+                                dialog.cancel();
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
+
 
 
 }

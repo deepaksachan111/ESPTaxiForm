@@ -28,7 +28,7 @@ public class MapWebViewActivity extends AppCompatActivity  implements SwipeRefre
         swipeRefreshLayout.setOnRefreshListener(this);
 
 
-         ImageView iv = (ImageView)findViewById(R.id.back_mapview) ;
+    /*     ImageView iv = (ImageView)findViewById(R.id.back_mapview) ;
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -36,7 +36,7 @@ public class MapWebViewActivity extends AppCompatActivity  implements SwipeRefre
             }
         });
 
-
+*/
 
         webView = (WebView) findViewById(R.id.webView1);
 

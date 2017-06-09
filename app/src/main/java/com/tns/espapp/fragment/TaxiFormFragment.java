@@ -132,7 +132,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
     private static final long FASTEST_INTERVAL = 1000 * 2 * 1; // 1 minute
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
-    ImageView iv_status;
+   //ImageView iv_status;
 
     public TaxiFormFragment() {
         // Required empty public constructor
@@ -171,7 +171,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
         View v = inflater.inflate(R.layout.fragment_taxi_form, container, false);
 
         Toolbar toolbar =(Toolbar)getActivity().findViewById(R.id.toolbar);
-         iv_status =(ImageView) toolbar. findViewById(R.id.status_taxiform);
+        // iv_status =(ImageView) toolbar. findViewById(R.id.status_taxiform);
 
         findIDS(v);
      /*   if (shouldAskPermissions()) {
@@ -287,8 +287,8 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
 
                     form_no =empid + "/" + formated_Date + "/" + paddedkeyid;*/
 
-                   tv_form_no.setText(form_no);
-
+                    current_date = getDate2;
+                    tv_form_no.setText(form_no);
                     edt_settaxiform_date.setText(getDate2);
                     edtproject_type.setText(ptype);
                     edt_vehicle_no.setText(vehi_no);
@@ -804,7 +804,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
             super.onPostExecute(s);
             pd.dismiss();
             getActivity().stopService(intent);
-            iv_status.setVisibility(View.GONE);
+          //  iv_status.setVisibility(View.GONE);
            // GPSTracker.isRunning= false;
 
 
@@ -1149,7 +1149,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
             //stopLocationUpdates();
 
 
-     getActivity().unregisterReceiver(broadcastReceiver);
+   //  getActivity().unregisterReceiver(broadcastReceiver);
       //GPSTracker.BUS.unregister(this);
     }
 
@@ -1168,7 +1168,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
         }
 
       //  GPSTracker.BUS.register(this);
-        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(GPSTracker.BROADCAST_ACTION));
+        //getActivity().registerReceiver(broadcastReceiver, new IntentFilter(GPSTracker.BROADCAST_ACTION));
     }
 
 
@@ -1181,7 +1181,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
 
        try {
 
-           getActivity().unregisterReceiver(broadcastReceiver);
+          // getActivity().unregisterReceiver(broadcastReceiver);
 
         }catch (Exception e){
 
@@ -1202,7 +1202,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
 
            boolean status = intent.getBooleanExtra("EXTRA",false);
           if(status == true) {
-              iv_status.setVisibility(View.VISIBLE);
+            //  iv_status.setVisibility(View.VISIBLE);
              // iv_status.setBackgroundResource(R.drawable.blink_animation);
               // AnimationDrawable frameAnimation = (AnimationDrawable) iv_status.getBackground();
 
@@ -1211,7 +1211,7 @@ public class TaxiFormFragment extends Fragment implements View.OnClickListener,
 
              // Toast.makeText(getActivity(), "running" + "", Toast.LENGTH_LONG).show();
           }else {
-              iv_status.setVisibility(View.GONE);
+            //  iv_status.setVisibility(View.GONE);
               Toast.makeText(getActivity(), "not running" + "", Toast.LENGTH_LONG).show();
           }
            // new  getDataTrackTaxiAsnycTask().execute(AppConstraint.TAXITRACKROOT);

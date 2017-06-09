@@ -244,11 +244,17 @@ public class TaxiFormRecordFragment extends Fragment {
                 public void onClick(View view) {
                     taxiFormData = searchlist.get(position);
 
-                    Intent intent = new Intent(getActivity(), MapWebViewActivity.class);
-                    intent.putExtra("formno",taxiFormData.getFormno());
-                    startActivity(intent);
+                   // Intent intent = new Intent(getActivity(), MapWebViewActivity.class);
+                   // intent.putExtra("formno",taxiFormData.getFormno());
+                   // startActivity(intent);
 
+                    MapWebViewFragment ldf = new MapWebViewFragment ();
+                    Bundle args = new Bundle();
+                    args.putString("formno",taxiFormData.getFormno());
+                    ldf.setArguments(args);
 
+//Inflate the fragment
+                    getFragmentManager().beginTransaction().add(R.id.frameLayout_home_frag, ldf).commit();
 
                 }
             });
