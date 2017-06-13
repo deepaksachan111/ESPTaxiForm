@@ -48,6 +48,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
+
                     android:id="@+id/input_email"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -98,6 +99,8 @@
     </RelativeLayout>
 
     <ImageButton
+
+       android:scaleType="fitXY"
         android:id="@+id/user_profile_photo"
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -105,7 +108,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:background="@drawable/user_profile_image_background"
-        android:elevation="4dp"
+        android:elevation="10dp"
         android:src="@mipmap/profile_icon" />
 
 

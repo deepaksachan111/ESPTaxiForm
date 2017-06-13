@@ -24,8 +24,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ReadNotificationActivity extends AppCompatActivity {
-      DatabaseHandler  db;
 
+    DatabaseHandler  db;
     MyCustomAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,13 +34,22 @@ public class ReadNotificationActivity extends AppCompatActivity {
         db = new DatabaseHandler(this);
 
 
-  /*      ImageView iv = (ImageView)findViewById(R.id.iv_notification_back) ;
+        /*
+        ImageView iv = (ImageView)findViewById(R.id.iv_notification_back) ;
         iv.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View v) {
                 finish();
             }
-        });*/
+
+
+        });
+
+       */
+
+
 
         TextView tv_set_notifu =(TextView)findViewById(R.id.tv_set_notifu);
         ListView listView =(ListView)findViewById(R.id.lst_notification) ;

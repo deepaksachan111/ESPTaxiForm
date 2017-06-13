@@ -41,6 +41,7 @@ import com.tns.espapp.fragment.LocationHistoryFragment;
 import com.tns.espapp.RouteMapsActivity;
 import com.tns.espapp.fragment.PernsonalInfoFragment;
 import com.tns.espapp.fragment.ReadNotificationFragment;
+import com.tns.espapp.fragment.RouteMapFragment;
 import com.tns.espapp.fragment.TaxiFormFragment;
 import com.tns.espapp.fragment.TaxiFormRecordFragment;
 import com.tns.espapp.service.SendLatiLongiServerIntentService;
@@ -280,9 +281,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout_home_frag, new FeedbackFragmentHistory()).addToBackStack(null).commit();
                 mDrawerLayout.closeDrawer(mDrawerPane);
 
-            }  else
-            if (v == tv_locationmap) {
+            }
+            else
+
+                if (v == tv_locationmap) {
                // tv_toolbar.setText("Current Location");
+
+                   // tv_toolbar.setText("Current Location  ");
+                   // getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout_home_frag, new RouteMapFragment()).addToBackStack(null).commit();
+
 
                 startActivity(new Intent(getApplicationContext(), RouteMapsActivity.class));
                 mDrawerLayout.closeDrawer(mDrawerPane);
@@ -335,8 +342,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void alertdiaologbackbutton() {
-
-
         if (this.lastBackPressTime < System.currentTimeMillis() - 4000) {
             toast = Toast.makeText(this, "Press back again to close this app", 4000);
             toast.show();
@@ -423,7 +428,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 Toast toast = Toast.makeText(HomeActivity.this, "This device doesn't support the crop action!", Toast.LENGTH_SHORT);
                 toast.show();
             }
-
 
             }
         });
